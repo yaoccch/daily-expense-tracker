@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Expense Tracker</title>
+  <link rel="stylesheet" href="expense-tracker.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="top-panel" aria-labelledby="app-title">
+      <div>
+        <p class="eyebrow">Daily records</p>
+        <h1 id="app-title">Expense Tracker</h1>
+      </div>
+      <div class="month-total" aria-live="polite">
+        <span>This month</span>
+        <strong id="monthTotal">$0.00</strong>
+      </div>
+    </section>
+
+    <section class="summary-grid" aria-label="Expense summary">
+      <article class="summary-card">
+        <span>Today</span>
+        <strong id="todayTotal">$0.00</strong>
+      </article>
+      <article class="summary-card">
+        <span>All records</span>
+        <strong id="recordCount">0</strong>
+      </article>
+      <article class="summary-card">
+        <span>Average</span>
+        <strong id="averageSpend">$0.00</strong>
+      </article>
+    </section>
+
+    <section class="workspace">
+      <form id="expenseForm" class="expense-form">
+        <input type="hidden" id="expenseId">
+        <div class="form-header">
+          <h2 id="formTitle">Add expense</h2>
+          <button type="button" id="cancelEdit" class="ghost-button hidden">Cancel</button>
+        </div>
+
+        <label>
+          Date
+          <input id="expenseDate" type="date" required>
+        </label>
+
+        <label>
+          Description
+          <input id="expenseName" type="text" placeholder="Lunch, fuel, groceries" maxlength="80" required>
+        </label>
+
+        <div class="form-row">
+          <label>
+            Amount
+            <input id="expenseAmount" type="number" min="0.01" step="0.01" placeholder="0.00" required>
+          </label>
+          <label>
+            Category
+            <select id="expenseCategory" required>
+              <option value="Food">Food</option>
+              <option value="Transport">Transport</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Bills">Bills</option>
+              <option value="Health">Health</option>
+              <option value="Other">Other</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          Note
+          <textarea id="expenseNote" rows="3" placeholder="Optional detail"></textarea>
+        </label>
+
+        <button type="submit" class="primary-button" id="submitButton">Save expense</button>
+      </form>
+
+      <section class="records-panel" aria-labelledby="records-title">
+        <div class="records-toolbar">
+          <div>
+            <p class="eyebrow">Ledger</p>
+            <h2 id="records-title">Expense records</h2>
+          </div>
+        </div>
+
+        <div class="filters" aria-label="Filter expenses">
+          <label>
+            From
+            <input id="filterFrom" type="date">
+          </label>
+          <label>
+            To
+            <input id="filterTo" type="date">
+          </label>
+          <label>
+            Category
+            <select id="filterCategory">
+              <option value="All">All</option>
+              <option value="Food">Food</option>
+              <option value="Transport">Transport</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Bills">Bills</option>
+              <option value="Health">Health</option>
+              <option value="Other">Other</option>
+            </select>
+          </label>
+          <button type="button" id="clearFilters" class="ghost-button">Clear</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th class="amount-cell">Amount</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="expenseRows"></tbody>
+          </table>
+          <p id="emptyState" class="empty-state">No expenses yet. Add your first daily record.</p>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="expense-tracker.js"></script>
+</body>
+</html>
