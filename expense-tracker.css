@@ -252,14 +252,6 @@ h2 {
   align-items: center;
 }
 
-.delete-book-button {
-  width: auto;
-  margin-top: 8px;
-  min-height: 28px;
-  padding: 4px 8px;
-  font-size: 0.78rem;
-}
-
 .active-book-label {
   margin: 6px 0 0;
   color: var(--muted);

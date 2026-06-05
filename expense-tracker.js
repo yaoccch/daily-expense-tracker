@@ -44,7 +44,6 @@ var householdId = "shared-household";
   var newBookMonth = document.getElementById("newBookMonth");
   var bookMessage = document.getElementById("bookMessage");
   var bookList = document.getElementById("bookList");
-  var deleteBookButton = document.getElementById("deleteBookButton");
   var expenseBook = document.getElementById("expenseBook");
   var activeBookLabel = document.getElementById("activeBookLabel");
   var expenseModal = document.getElementById("expenseModal");
@@ -174,8 +173,6 @@ var householdId = "shared-household";
   bookList.addEventListener("change", function () {
     selectMonthBook(bookList.value);
   });
-
-  deleteBookButton.addEventListener("click", deleteSelectedBook);
 
   expenseBook.addEventListener("change", function () {
     selectMonthBook(expenseBook.value);
@@ -530,46 +527,6 @@ var householdId = "shared-household";
       label: formatMonthLabel(monthId),
       updatedAt: serverTimestamp()
     }, { merge: true });
-  }
-
-  async function deleteSelectedBook() {
-    var monthId = selectedMonthId;
-    if (!currentUser || !monthId) {
-      return;
-    }
-
-    var label = formatMonthLabel(monthId);
-    var recordsInBook = expenses.filter(function (item) {
-      return item.monthId === monthId;
-    });
-    var message = "Delete " + label + " and " + recordsInBook.length + " record" + (recordsInBook.length === 1 ? "" : "s") + "?";
-    if (!window.confirm(message)) {
-      return;
-    }
-
-    deleteBookButton.disabled = true;
-    setBookStatus("Deleting book...", "");
-
-    try {
-      for (var index = 0; index < recordsInBook.length; index += 1) {
-        await deleteDoc(expenseDoc(monthId, recordsInBook[index].id));
-      }
-      await deleteDoc(monthDoc(monthId));
-
-      var nextMonth = months.find(function (month) {
-        return month.id !== monthId;
-      });
-      selectedMonthId = nextMonth ? nextMonth.id : getMonthId(todayAsInput());
-      expenseBook.value = selectedMonthId;
-      newBookMonth.value = selectedMonthId;
-      expenseDate.value = defaultDateForMonth(selectedMonthId);
-      setBookStatus("Book deleted.", "success");
-      render();
-    } catch (error) {
-      setBookStatus(friendlyFirebaseError(error), "error");
-    } finally {
-      deleteBookButton.disabled = false;
-    }
   }
 
   function selectMonthBook(monthId) {
