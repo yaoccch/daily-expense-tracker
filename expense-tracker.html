@@ -127,6 +127,9 @@
           </label>
         </fieldset>
 
+        <button type="submit" class="primary-button" id="submitButton">Save expense</button>
+        <p id="appMessage" class="status-message app-message" aria-live="polite"></p>
+
         <label>
           Book
           <select id="expenseBook" required></select>
@@ -134,13 +137,19 @@
 
         <label>
           Date
-          <input id="expenseDate" type="text" inputmode="numeric" placeholder="YYYY-MM-DD" pattern="\d{4}-\d{2}-\d{2}" autocomplete="off" required>
+          <input id="expenseDate" type="date" lang="en" required>
         </label>
 
         <label>
           Description
           <input id="expenseName" type="text" maxlength="80" required>
         </label>
+        <div class="description-presets" aria-label="Description shortcuts">
+          <button type="button" data-description="Costco">Costco</button>
+          <button type="button" data-description="Marshalls">Marshalls</button>
+          <button type="button" data-description="Walmart">Walmart</button>
+          <button type="button" data-description="Amazon">Amazon</button>
+        </div>
 
         <div class="form-row">
           <label>
@@ -176,9 +185,6 @@
           Note
           <textarea id="expenseNote" rows="3" placeholder="Optional detail"></textarea>
         </label>
-
-        <button type="submit" class="primary-button" id="submitButton">Save expense</button>
-        <p id="appMessage" class="status-message app-message" aria-live="polite"></p>
       </form>
     </div>
     </section>

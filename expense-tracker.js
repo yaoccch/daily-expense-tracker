@@ -55,6 +55,7 @@ var householdId = "shared-household";
   var expenseAmount = document.getElementById("expenseAmount");
   var expenseCategory = document.getElementById("expenseCategory");
   var categoryField = document.getElementById("categoryField");
+  var descriptionPresets = document.querySelector(".description-presets");
   var expenseNote = document.getElementById("expenseNote");
   var appMessage = document.getElementById("appMessage");
   var rows = document.getElementById("expenseRows");
@@ -178,6 +179,15 @@ var householdId = "shared-household";
 
   document.querySelectorAll("input[name=\"entryType\"]").forEach(function (control) {
     control.addEventListener("change", updateEntryLabels);
+  });
+
+  descriptionPresets.addEventListener("click", function (event) {
+    var button = event.target.closest("button[data-description]");
+    if (!button) {
+      return;
+    }
+    expenseName.value = button.getAttribute("data-description") || "";
+    expenseName.focus();
   });
 
   form.addEventListener("submit", async function (event) {

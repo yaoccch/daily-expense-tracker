@@ -286,6 +286,15 @@ h2 {
   margin-bottom: 10px;
 }
 
+.form-header h2 {
+  min-width: 0;
+}
+
+.form-header .ghost-button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
 .expense-form {
   padding: 10px;
 }
@@ -416,6 +425,29 @@ textarea:focus {
 .entry-toggle input:checked + span {
   border-color: var(--accent);
   background: #eff6ff;
+  color: var(--accent-dark);
+}
+
+.description-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: -2px 0 6px;
+}
+
+.description-presets button {
+  min-height: 26px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f8fafc;
+  color: var(--ink);
+  padding: 4px 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.description-presets button:active {
+  border-color: var(--accent);
   color: var(--accent-dark);
 }
 
