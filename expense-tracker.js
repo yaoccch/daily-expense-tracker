@@ -626,7 +626,7 @@ var householdId = "shared-household";
   }
 
   function formatMonthLabel(monthId) {
-    return new Date(monthId + "-01T00:00:00").toLocaleDateString(undefined, {
+    return new Date(monthId + "-01T00:00:00").toLocaleDateString("en-US", {
       year: "numeric",
       month: "long"
     });
@@ -640,7 +640,7 @@ var householdId = "shared-household";
   }
 
   function formatDate(value) {
-    return new Date(value + "T00:00:00").toLocaleDateString(undefined, {
+    return new Date(value + "T00:00:00").toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric"
@@ -648,7 +648,7 @@ var householdId = "shared-household";
   }
 
   function formatMoney(value) {
-    return new Intl.NumberFormat(undefined, {
+    return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD"
     }).format(Number(value || 0));

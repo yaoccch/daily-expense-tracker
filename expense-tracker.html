@@ -40,15 +40,15 @@
 
     <section class="summary-grid" aria-label="Expense summary">
       <article class="summary-card">
-        <span>Book total</span>
-        <strong id="monthTotal">$0.00</strong>
-      </article>
-      <article class="summary-card">
         <span>Income</span>
         <strong id="incomeTotal">$0.00</strong>
       </article>
       <article class="summary-card">
-        <span>Today</span>
+        <span>Expense</span>
+        <strong id="monthTotal">$0.00</strong>
+      </article>
+      <article class="summary-card">
+        <span>Today spend</span>
         <strong id="todayTotal">$0.00</strong>
       </article>
     </section>
@@ -85,7 +85,6 @@
               <option value="Shopping">Shopping</option>
               <option value="Bills">Bills</option>
               <option value="Health">Health</option>
-              <option value="Salary">Salary</option>
               <option value="Other">Other</option>
             </select>
           </label>
@@ -101,7 +100,7 @@
       <form id="bookForm" class="book-form">
         <label>
           New book
-          <input id="newBookMonth" type="month" required>
+          <input id="newBookMonth" type="month" lang="en" required>
         </label>
         <button type="submit" class="primary-button">Create</button>
       </form>
@@ -134,7 +133,7 @@
 
         <label>
           Date
-          <input id="expenseDate" type="date" required>
+          <input id="expenseDate" type="date" lang="en" required>
         </label>
 
         <label>
@@ -155,7 +154,6 @@
               <option value="Shopping">Shopping</option>
               <option value="Bills">Bills</option>
               <option value="Health">Health</option>
-              <option value="Salary">Salary</option>
               <option value="Other">Other</option>
             </select>
           </label>
