@@ -39,6 +39,11 @@ var householdId = "shared-household";
   var authMessage = document.getElementById("authMessage");
   var userEmail = document.getElementById("userEmail");
   var signOutButton = document.getElementById("signOutButton");
+  var bookForm = document.getElementById("bookForm");
+  var newBookMonth = document.getElementById("newBookMonth");
+  var bookList = document.getElementById("bookList");
+  var expenseBook = document.getElementById("expenseBook");
+  var activeBookLabel = document.getElementById("activeBookLabel");
   var form = document.getElementById("expenseForm");
   var expenseId = document.getElementById("expenseId");
   var expenseDate = document.getElementById("expenseDate");
@@ -46,6 +51,7 @@ var householdId = "shared-household";
   var expenseAmount = document.getElementById("expenseAmount");
   var expenseCategory = document.getElementById("expenseCategory");
   var expenseNote = document.getElementById("expenseNote");
+  var appMessage = document.getElementById("appMessage");
   var rows = document.getElementById("expenseRows");
   var emptyState = document.getElementById("emptyState");
   var formTitle = document.getElementById("formTitle");
@@ -64,12 +70,17 @@ var householdId = "shared-household";
   var auth;
   var db;
   var currentUser = null;
+  var months = [];
+  var selectedMonthId = getMonthId(todayAsInput());
   var expenses = [];
   var monthUnsubscribe = null;
   var expenseUnsubscribes = [];
   var editingMonthId = "";
 
   expenseDate.value = todayAsInput();
+  expenseDate.min = selectedMonthId + "-01";
+  expenseDate.max = lastDateForMonth(selectedMonthId);
+  newBookMonth.value = selectedMonthId;
   render();
 
   if (firebaseConfig.apiKey.indexOf("PASTE_") === 0) {
@@ -86,6 +97,9 @@ var householdId = "shared-household";
         userEmail.textContent = user.email || "";
         authPanel.classList.add("hidden");
         appPanel.classList.remove("hidden");
+        ensureMonthBook(selectedMonthId).catch(function (error) {
+          setStatus(friendlyFirebaseError(error), "error");
+        });
         listenForSharedExpenses();
       } else {
         stopListening();
@@ -114,6 +128,34 @@ var householdId = "shared-household";
     signOut(auth);
   });
 
+  bookForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    if (!currentUser || !newBookMonth.value) {
+      return;
+    }
+
+    try {
+      setStatus("Creating book...", "");
+      await ensureMonthBook(newBookMonth.value);
+      selectMonthBook(newBookMonth.value);
+      setStatus("Book is ready.", "success");
+    } catch (error) {
+      setStatus(friendlyFirebaseError(error), "error");
+    }
+  });
+
+  bookList.addEventListener("click", function (event) {
+    var button = event.target.closest("button[data-month-id]");
+    if (button) {
+      selectMonthBook(button.getAttribute("data-month-id"));
+    }
+  });
+
+  expenseBook.addEventListener("change", function () {
+    selectMonthBook(expenseBook.value);
+  });
+
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
@@ -121,7 +163,7 @@ var householdId = "shared-household";
       return;
     }
 
-    var monthId = getMonthId(expenseDate.value);
+    var monthId = expenseBook.value || getMonthId(expenseDate.value);
     var record = {
       date: expenseDate.value,
       name: expenseName.value.trim(),
@@ -137,14 +179,15 @@ var householdId = "shared-household";
       return;
     }
 
+    if (record.date.slice(0, 7) !== monthId) {
+      record.date = defaultDateForMonth(monthId);
+    }
+
     submitButton.disabled = true;
-    authMessage.textContent = "";
+    setStatus("Saving expense...", "");
 
     try {
-      await setDoc(monthDoc(monthId), {
-        label: formatMonthLabel(monthId),
-        updatedAt: serverTimestamp()
-      }, { merge: true });
+      await ensureMonthBook(monthId);
 
       if (expenseId.value) {
         if (editingMonthId && editingMonthId !== monthId) {
@@ -166,8 +209,9 @@ var householdId = "shared-household";
       }
 
       resetForm();
+      setStatus("Expense saved to Firebase.", "success");
     } catch (error) {
-      authMessage.textContent = friendlyFirebaseError(error);
+      setStatus(friendlyFirebaseError(error), "error");
     } finally {
       submitButton.disabled = false;
     }
@@ -196,8 +240,9 @@ var householdId = "shared-household";
     if (action === "delete") {
       try {
         await deleteDoc(expenseDoc(record.monthId, id));
+        setStatus("Expense deleted.", "success");
       } catch (error) {
-        authMessage.textContent = friendlyFirebaseError(error);
+        setStatus(friendlyFirebaseError(error), "error");
       }
     }
   });
@@ -216,6 +261,7 @@ var householdId = "shared-household";
   });
 
   function render() {
+    renderBooks();
     var visibleExpenses = getFilteredExpenses();
     visibleExpenses.sort(function (a, b) {
       return b.date.localeCompare(a.date) || b.id.localeCompare(a.id);
@@ -245,11 +291,11 @@ var householdId = "shared-household";
   function createExpenseRow(item) {
     var row = document.createElement("tr");
     row.innerHTML = [
-      "<td>" + formatDate(item.date) + "</td>",
-      "<td><div class=\"row-title\">" + escapeHtml(item.name) + "</div>" + renderNote(item.note) + "</td>",
-      "<td><span class=\"tag\">" + escapeHtml(item.category) + "</span></td>",
-      "<td class=\"amount-cell\">" + formatMoney(item.amount) + "</td>",
-      "<td><div class=\"actions\">",
+      "<td data-label=\"Date\">" + formatDate(item.date) + "</td>",
+      "<td data-label=\"Description\"><div class=\"row-title\">" + escapeHtml(item.name) + "</div>" + renderNote(item.note) + "</td>",
+      "<td data-label=\"Category\"><span class=\"tag\">" + escapeHtml(item.category) + "</span></td>",
+      "<td data-label=\"Amount\" class=\"amount-cell\">" + formatMoney(item.amount) + "</td>",
+      "<td data-label=\"Actions\"><div class=\"actions\">",
       "<button type=\"button\" class=\"ghost-button\" data-action=\"edit\" data-id=\"" + item.id + "\">Edit</button>",
       "<button type=\"button\" class=\"danger-button\" data-action=\"delete\" data-id=\"" + item.id + "\">Delete</button>",
       "</div></td>"
@@ -263,19 +309,21 @@ var householdId = "shared-household";
 
   function getFilteredExpenses() {
     return expenses.filter(function (item) {
+      var bookMatches = !selectedMonthId || item.monthId === selectedMonthId;
       var fromMatches = !filterFrom.value || item.date >= filterFrom.value;
       var toMatches = !filterTo.value || item.date <= filterTo.value;
       var categoryMatches = filterCategory.value === "All" || item.category === filterCategory.value;
-      return fromMatches && toMatches && categoryMatches;
+      return bookMatches && fromMatches && toMatches && categoryMatches;
     });
   }
 
   function updateSummary() {
     var today = todayAsInput();
-    var month = today.slice(0, 7);
-    var allTotal = expenses.reduce(sumAmount, 0);
+    var visibleExpenses = getFilteredExpenses();
+    var month = selectedMonthId || today.slice(0, 7);
+    var allTotal = visibleExpenses.reduce(sumAmount, 0);
     var monthSum = expenses.filter(function (item) {
-      return item.date.slice(0, 7) === month;
+      return item.monthId === month;
     }).reduce(sumAmount, 0);
     var todaySum = expenses.filter(function (item) {
       return item.date === today;
@@ -283,8 +331,8 @@ var householdId = "shared-household";
 
     todayTotal.textContent = formatMoney(todaySum);
     monthTotal.textContent = formatMoney(monthSum);
-    recordCount.textContent = String(expenses.length);
-    averageSpend.textContent = formatMoney(expenses.length ? allTotal / expenses.length : 0);
+    recordCount.textContent = String(visibleExpenses.length);
+    averageSpend.textContent = formatMoney(visibleExpenses.length ? allTotal / visibleExpenses.length : 0);
   }
 
   function sumAmount(total, item) {
@@ -294,6 +342,7 @@ var householdId = "shared-household";
   function startEdit(record) {
     expenseId.value = record.id;
     editingMonthId = record.monthId;
+    selectMonthBook(record.monthId);
     expenseDate.value = record.date;
     expenseName.value = record.name;
     expenseAmount.value = record.amount;
@@ -309,7 +358,8 @@ var householdId = "shared-household";
     form.reset();
     expenseId.value = "";
     editingMonthId = "";
-    expenseDate.value = todayAsInput();
+    expenseBook.value = selectedMonthId;
+    expenseDate.value = defaultDateForMonth(selectedMonthId);
     formTitle.textContent = "Add expense";
     submitButton.textContent = "Save expense";
     cancelEdit.classList.add("hidden");
@@ -318,16 +368,21 @@ var householdId = "shared-household";
   function listenForSharedExpenses() {
     stopListening();
 
-    monthUnsubscribe = onSnapshot(query(collection(db, "households", householdId, "months"), orderBy("label", "desc")), function (snapshot) {
+    monthUnsubscribe = onSnapshot(collection(db, "households", householdId, "months"), function (snapshot) {
       expenseUnsubscribes.forEach(function (unsubscribe) {
         unsubscribe();
       });
       expenseUnsubscribes = [];
       expenses = [];
+      months = [];
       render();
 
       snapshot.forEach(function (monthSnapshot) {
         var monthId = monthSnapshot.id;
+        months.push({
+          id: monthId,
+          label: monthSnapshot.data().label || formatMonthLabel(monthId)
+        });
         var unsubscribeExpenses = onSnapshot(query(expenseCollection(monthId), orderBy("date", "desc")), function (expenseSnapshot) {
           expenses = expenses.filter(function (item) {
             return item.monthId !== monthId;
@@ -343,13 +398,20 @@ var householdId = "shared-household";
 
         render();
       }, function (error) {
-        authMessage.textContent = friendlyFirebaseError(error);
+        setStatus(friendlyFirebaseError(error), "error");
       });
 
       expenseUnsubscribes.push(unsubscribeExpenses);
     });
+      months.sort(function (a, b) {
+        return b.id.localeCompare(a.id);
+      });
+      if (!months.some(function (month) { return month.id === selectedMonthId; }) && months.length) {
+        selectedMonthId = months[0].id;
+      }
+      render();
     }, function (error) {
-      authMessage.textContent = friendlyFirebaseError(error);
+      setStatus(friendlyFirebaseError(error), "error");
       stopListening();
     });
   }
@@ -379,6 +441,79 @@ var householdId = "shared-household";
 
   function getMonthId(dateValue) {
     return dateValue.slice(0, 7);
+  }
+
+  async function ensureMonthBook(monthId) {
+    await setDoc(monthDoc(monthId), {
+      label: formatMonthLabel(monthId),
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+  }
+
+  function selectMonthBook(monthId) {
+    selectedMonthId = monthId;
+    expenseBook.value = monthId;
+    newBookMonth.value = monthId;
+    if (!expenseDate.value || expenseDate.value.slice(0, 7) !== monthId) {
+      expenseDate.value = defaultDateForMonth(monthId);
+    }
+    expenseDate.min = monthId + "-01";
+    expenseDate.max = lastDateForMonth(monthId);
+    render();
+  }
+
+  function renderBooks() {
+    var knownMonths = months.slice();
+    if (!knownMonths.some(function (month) { return month.id === selectedMonthId; })) {
+      knownMonths.push({
+        id: selectedMonthId,
+        label: formatMonthLabel(selectedMonthId)
+      });
+    }
+
+    knownMonths.sort(function (a, b) {
+      return b.id.localeCompare(a.id);
+    });
+
+    expenseBook.innerHTML = "";
+    bookList.innerHTML = "";
+    knownMonths.forEach(function (month) {
+      var option = document.createElement("option");
+      option.value = month.id;
+      option.textContent = month.label;
+      expenseBook.appendChild(option);
+
+      var button = document.createElement("button");
+      button.type = "button";
+      button.className = "book-button" + (month.id === selectedMonthId ? " active" : "");
+      button.setAttribute("data-month-id", month.id);
+      button.innerHTML = "<span>" + escapeHtml(month.label) + "</span><strong>" + formatMoney(totalForMonth(month.id)) + "</strong>";
+      bookList.appendChild(button);
+    });
+
+    expenseBook.value = selectedMonthId;
+    activeBookLabel.textContent = selectedMonthId ? formatMonthLabel(selectedMonthId) : "No book selected";
+  }
+
+  function totalForMonth(monthId) {
+    return expenses.filter(function (item) {
+      return item.monthId === monthId;
+    }).reduce(sumAmount, 0);
+  }
+
+  function defaultDateForMonth(monthId) {
+    var today = todayAsInput();
+    if (today.slice(0, 7) === monthId) {
+      return today;
+    }
+    return monthId + "-01";
+  }
+
+  function lastDateForMonth(monthId) {
+    var parts = monthId.split("-");
+    var year = Number(parts[0]);
+    var month = Number(parts[1]);
+    return new Date(year, month, 0).toISOString().slice(0, 10);
   }
 
   function formatMonthLabel(monthId) {
@@ -437,6 +572,12 @@ var householdId = "shared-household";
     }
 
     return error.message || "Firebase could not complete that action.";
+  }
+
+  function setStatus(message, type) {
+    appMessage.textContent = message || "";
+    appMessage.classList.toggle("status-error", type === "error");
+    appMessage.classList.toggle("status-success", type === "success");
   }
 
 })();

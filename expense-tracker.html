@@ -58,6 +58,23 @@
       </article>
     </section>
 
+    <section class="book-panel" aria-labelledby="book-title">
+      <div class="book-toolbar">
+        <div>
+          <p class="eyebrow">Monthly books</p>
+          <h2 id="book-title">Expense books</h2>
+        </div>
+        <form id="bookForm" class="book-form">
+          <label>
+            New book
+            <input id="newBookMonth" type="month" required>
+          </label>
+          <button type="submit" class="primary-button">Create</button>
+        </form>
+      </div>
+      <div id="bookList" class="book-list" aria-label="Expense books"></div>
+    </section>
+
     <section class="workspace">
       <form id="expenseForm" class="expense-form">
         <input type="hidden" id="expenseId">
@@ -65,6 +82,11 @@
           <h2 id="formTitle">Add expense</h2>
           <button type="button" id="cancelEdit" class="ghost-button hidden">Cancel</button>
         </div>
+
+        <label>
+          Book
+          <select id="expenseBook" required></select>
+        </label>
 
         <label>
           Date
@@ -100,6 +122,7 @@
         </label>
 
         <button type="submit" class="primary-button" id="submitButton">Save expense</button>
+        <p id="appMessage" class="status-message app-message" aria-live="polite"></p>
       </form>
 
       <section class="records-panel" aria-labelledby="records-title">
@@ -107,6 +130,7 @@
           <div>
             <p class="eyebrow">Ledger</p>
             <h2 id="records-title">Expense records</h2>
+            <p id="activeBookLabel" class="active-book-label">No book selected</p>
           </div>
         </div>
 
