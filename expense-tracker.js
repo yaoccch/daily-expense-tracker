@@ -63,6 +63,7 @@ var householdId = "shared-household";
   var filterCategory = document.getElementById("filterCategory");
   var todayTotal = document.getElementById("todayTotal");
   var monthTotal = document.getElementById("monthTotal");
+  var incomeTotal = document.getElementById("incomeTotal");
 
   var app;
   var auth;
@@ -170,6 +171,10 @@ var householdId = "shared-household";
     selectMonthBook(expenseBook.value);
   });
 
+  document.querySelectorAll("input[name=\"entryType\"]").forEach(function (control) {
+    control.addEventListener("change", updateEntryLabels);
+  });
+
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
@@ -182,6 +187,7 @@ var householdId = "shared-household";
       date: expenseDate.value,
       name: expenseName.value.trim(),
       amount: Number(expenseAmount.value),
+      type: getSelectedEntryType(),
       category: expenseCategory.value,
       paidBy: getSelectedPayer(),
       note: expenseNote.value.trim(),
@@ -302,10 +308,10 @@ var householdId = "shared-household";
     row.innerHTML = [
       "<div class=\"expense-main\">",
       "<div class=\"row-title\">" + escapeHtml(item.name) + "</div>",
-      "<div class=\"row-meta\">" + escapeHtml(item.category) + " · " + escapeHtml(item.paidBy || "-") + renderNoteText(item.note) + "</div>",
+      "<div class=\"row-meta\">" + renderCategory(item.category) + " · " + escapeHtml(item.paidBy || "-") + renderNoteText(item.note) + "</div>",
       "</div>",
       "<div class=\"expense-side\">",
-      "<strong>" + formatMoney(item.amount) + "</strong>",
+      "<strong class=\"" + amountClass(item) + "\">" + formatSignedMoney(item) + "</strong>",
       "<div class=\"actions\">",
       "<button type=\"button\" class=\"ghost-button\" data-action=\"edit\" data-id=\"" + item.id + "\">Edit</button>",
       "<button type=\"button\" class=\"danger-button\" data-action=\"delete\" data-id=\"" + item.id + "\">Delete</button>",
@@ -333,17 +339,20 @@ var householdId = "shared-household";
 
   function updateSummary() {
     var today = todayAsInput();
-    var visibleExpenses = getFilteredExpenses();
     var month = selectedMonthId || today.slice(0, 7);
-    var monthSum = expenses.filter(function (item) {
-      return item.monthId === month;
+    var monthExpenseSum = expenses.filter(function (item) {
+      return item.monthId === month && getEntryType(item) === "expense";
+    }).reduce(sumAmount, 0);
+    var monthIncomeSum = expenses.filter(function (item) {
+      return item.monthId === month && getEntryType(item) === "income";
     }).reduce(sumAmount, 0);
     var todaySum = expenses.filter(function (item) {
-      return item.date === today;
+      return item.date === today && getEntryType(item) === "expense";
     }).reduce(sumAmount, 0);
 
     todayTotal.textContent = formatMoney(todaySum);
-    monthTotal.textContent = formatMoney(monthSum);
+    monthTotal.textContent = formatMoney(monthExpenseSum);
+    incomeTotal.textContent = formatMoney(monthIncomeSum);
   }
 
   function sumAmount(total, item) {
@@ -357,11 +366,11 @@ var householdId = "shared-household";
     expenseDate.value = record.date;
     expenseName.value = record.name;
     expenseAmount.value = record.amount;
+    setSelectedEntryType(getEntryType(record));
     expenseCategory.value = record.category;
     setSelectedPayer(record.paidBy || "yc");
     expenseNote.value = record.note || "";
-    formTitle.textContent = "Edit expense";
-    submitButton.textContent = "Update expense";
+    updateEntryLabels();
     openModal();
     expenseName.focus();
   }
@@ -372,9 +381,9 @@ var householdId = "shared-household";
     editingMonthId = "";
     expenseBook.value = selectedMonthId;
     expenseDate.value = defaultDateForMonth(selectedMonthId);
+    setSelectedEntryType("expense");
     setSelectedPayer("yc");
-    formTitle.textContent = "Add expense";
-    submitButton.textContent = "Save expense";
+    updateEntryLabels();
   }
 
   function openModal() {
@@ -528,6 +537,47 @@ var householdId = "shared-household";
   function getSelectedPayer() {
     var selected = document.querySelector("input[name=\"expensePaidBy\"]:checked");
     return selected ? selected.value : "yc";
+  }
+
+  function getSelectedEntryType() {
+    var selected = document.querySelector("input[name=\"entryType\"]:checked");
+    return selected ? selected.value : "expense";
+  }
+
+  function setSelectedEntryType(value) {
+    var selected = document.querySelector("input[name=\"entryType\"][value=\"" + value + "\"]");
+    if (selected) {
+      selected.checked = true;
+    }
+    updateEntryLabels();
+  }
+
+  function getEntryType(item) {
+    return item.type === "income" ? "income" : "expense";
+  }
+
+  function amountClass(item) {
+    return getEntryType(item) === "income" ? "income-amount" : "expense-amount";
+  }
+
+  function formatSignedMoney(item) {
+    var prefix = getEntryType(item) === "income" ? "+" : "";
+    return prefix + formatMoney(item.amount);
+  }
+
+  function renderCategory(category) {
+    return "<span class=\"category-with-icon\"><span class=\"category-icon category-" + escapeHtml(categorySlug(category)) + "\"></span>" + escapeHtml(category || "Other") + "</span>";
+  }
+
+  function categorySlug(category) {
+    return String(category || "Other").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  }
+
+  function updateEntryLabels() {
+    var type = getSelectedEntryType();
+    var isEditing = Boolean(expenseId.value);
+    formTitle.textContent = (isEditing ? "Edit " : "Add ") + type;
+    submitButton.textContent = (isEditing ? "Update " : "Save ") + type;
   }
 
   function setSelectedPayer(value) {

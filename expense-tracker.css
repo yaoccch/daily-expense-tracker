@@ -5,10 +5,11 @@
   --muted: #667085;
   --line: #d8dee9;
   --panel: #ffffff;
-  --accent: #1d766f;
-  --accent-dark: #13534e;
+  --accent: #2563eb;
+  --accent-dark: #1d4ed8;
   --warm: #b65f2a;
   --danger: #b42318;
+  --income: #16803c;
   --shadow: 0 16px 40px rgba(23, 32, 51, 0.08);
 }
 
@@ -172,7 +173,7 @@ h2 {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   margin: 10px 0;
 }
@@ -185,6 +186,10 @@ h2 {
   display: block;
   margin-top: 4px;
   font-size: 0.95rem;
+}
+
+#incomeTotal {
+  color: var(--income);
 }
 
 .book-panel {
@@ -353,7 +358,8 @@ textarea:focus {
   color: var(--danger);
 }
 
-.payer-toggle {
+.payer-toggle,
+.entry-toggle {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
@@ -362,7 +368,8 @@ textarea:focus {
   padding: 0;
 }
 
-.payer-toggle legend {
+.payer-toggle legend,
+.entry-toggle legend {
   grid-column: 1 / -1;
   color: var(--muted);
   font-size: 0.9rem;
@@ -370,17 +377,20 @@ textarea:focus {
   margin-bottom: 7px;
 }
 
-.payer-toggle label {
+.payer-toggle label,
+.entry-toggle label {
   margin: 0;
 }
 
-.payer-toggle input {
+.payer-toggle input,
+.entry-toggle input {
   position: absolute;
   opacity: 0;
   pointer-events: none;
 }
 
-.payer-toggle span {
+.payer-toggle span,
+.entry-toggle span {
   display: grid;
   min-height: 42px;
   place-items: center;
@@ -391,9 +401,10 @@ textarea:focus {
   font-weight: 700;
 }
 
-.payer-toggle input:checked + span {
+.payer-toggle input:checked + span,
+.entry-toggle input:checked + span {
   border-color: var(--accent);
-  background: #edf8f6;
+  background: #eff6ff;
   color: var(--accent-dark);
 }
 
@@ -450,6 +461,14 @@ textarea:focus {
   white-space: nowrap;
 }
 
+.expense-amount {
+  color: var(--ink);
+}
+
+.income-amount {
+  color: var(--income);
+}
+
 .row-title {
   font-weight: 700;
 }
@@ -467,6 +486,46 @@ textarea:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.category-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.category-icon {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #94a3b8;
+  flex: 0 0 auto;
+}
+
+.category-food {
+  background: #f59e0b;
+}
+
+.category-transport {
+  background: #0ea5e9;
+}
+
+.category-shopping {
+  background: #a855f7;
+}
+
+.category-bills {
+  background: #64748b;
+}
+
+.category-health {
+  background: #ef4444;
+}
+
+.category-salary {
+  background: var(--income);
 }
 
 .tag {
@@ -497,9 +556,9 @@ textarea:focus {
 }
 
 .actions button {
-  min-height: 26px;
-  padding: 3px 7px;
-  font-size: 0.75rem;
+  min-height: 22px;
+  padding: 2px 6px;
+  font-size: 0.68rem;
 }
 
 .empty-state {
@@ -548,7 +607,7 @@ textarea:focus {
   }
 
   .summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .book-toolbar,
@@ -660,8 +719,8 @@ textarea:focus {
 
   .summary-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
     margin: 10px 0;
     overflow: visible;
     padding: 0;
@@ -671,11 +730,15 @@ textarea:focus {
     min-width: 0;
     border: 1px solid var(--line);
     border-radius: 8px;
-    padding: 10px 12px;
+    padding: 8px;
   }
 
   .summary-card strong {
-    font-size: 0.95rem;
+    font-size: 0.78rem;
+  }
+
+  .summary-card span {
+    font-size: 0.65rem;
   }
 
   .book-panel,
@@ -735,8 +798,8 @@ textarea:focus {
   }
 
   .actions button {
-    min-height: 30px;
-    padding: 4px 8px;
+    min-height: 22px;
+    padding: 2px 6px;
   }
 
   .expense-row {
