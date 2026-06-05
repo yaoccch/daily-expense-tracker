@@ -8,14 +8,38 @@
 </head>
 <body>
   <main class="app-shell">
+    <section id="authPanel" class="auth-panel" aria-labelledby="login-title">
+      <div>
+        <p class="eyebrow">Private household</p>
+        <h1 id="login-title">Sign in</h1>
+        <p class="auth-note">Only approved Firebase users can read or record shared expenses.</p>
+      </div>
+
+      <form id="loginForm" class="login-form">
+        <label>
+          Email
+          <input id="loginEmail" type="email" autocomplete="email" required>
+        </label>
+        <label>
+          Password
+          <input id="loginPassword" type="password" autocomplete="current-password" required>
+        </label>
+        <button type="submit" class="primary-button">Sign in</button>
+        <p id="authMessage" class="status-message" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section id="appPanel" class="hidden">
     <section class="top-panel" aria-labelledby="app-title">
       <div>
         <p class="eyebrow">Daily records</p>
         <h1 id="app-title">Expense Tracker</h1>
+        <p class="signed-in">Signed in as <span id="userEmail"></span></p>
       </div>
       <div class="month-total" aria-live="polite">
         <span>This month</span>
         <strong id="monthTotal">$0.00</strong>
+        <button type="button" id="signOutButton" class="ghost-button sign-out-button">Sign out</button>
       </div>
     </section>
 
@@ -116,10 +140,10 @@
               <tr>
                 <th>Date</th>
                 <th>Description</th>
-                <th>Category</th>
-                <th class="amount-cell">Amount</th>
-                <th>Actions</th>
-              </tr>
+            <th>Category</th>
+            <th class="amount-cell">Amount</th>
+            <th>Actions</th>
+          </tr>
             </thead>
             <tbody id="expenseRows"></tbody>
           </table>
@@ -127,8 +151,9 @@
         </div>
       </section>
     </section>
+    </section>
   </main>
 
-  <script src="expense-tracker.js"></script>
+  <script type="module" src="expense-tracker.js"></script>
 </body>
 </html>

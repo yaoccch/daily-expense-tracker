@@ -44,11 +44,56 @@ button {
 .top-panel,
 .expense-form,
 .records-panel,
-.summary-card {
+.summary-card,
+.auth-panel {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 8px;
   box-shadow: var(--shadow);
+}
+
+.auth-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 24px;
+  align-items: center;
+  min-height: 420px;
+  padding: 28px;
+}
+
+.auth-note,
+.signed-in,
+.status-message {
+  color: var(--muted);
+}
+
+.auth-note {
+  max-width: 34rem;
+  line-height: 1.5;
+}
+
+.signed-in {
+  margin: 8px 0 0;
+  font-size: 0.92rem;
+}
+
+.login-form {
+  display: grid;
+  gap: 14px;
+}
+
+.login-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.status-message {
+  min-height: 20px;
+  margin: 0;
+  font-size: 0.9rem;
 }
 
 .top-panel {
@@ -103,6 +148,10 @@ h2 {
   margin-top: 6px;
   color: var(--accent-dark);
   font-size: 1.8rem;
+}
+
+.sign-out-button {
+  margin-top: 12px;
 }
 
 .summary-grid {
@@ -282,6 +331,12 @@ th {
   font-size: 0.88rem;
 }
 
+.month-row td {
+  background: #f8fafc;
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+
 .tag {
   display: inline-block;
   border-radius: 999px;
@@ -317,8 +372,13 @@ th {
 
 @media (max-width: 860px) {
   .top-panel,
-  .workspace {
+  .workspace,
+  .auth-panel {
     display: block;
+  }
+
+  .login-form {
+    margin-top: 22px;
   }
 
   .month-total {

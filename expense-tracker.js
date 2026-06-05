@@ -1,5 +1,44 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getFirestore,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  setDoc,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+var firebaseConfig = {
+  apiKey: "AIzaSyAoRMybyh_83sEgcKnF_yUK3_hs4zXWF9c",
+  authDomain: "expense-3ddb0.firebaseapp.com",
+  projectId: "expense-3ddb0",
+  storageBucket: "expense-3ddb0.firebasestorage.app",
+  messagingSenderId: "678543474449",
+  appId: "1:678543474449:web:9fe7f3c4c4120c6fa496b0"
+};
+
+var householdId = "shared-household";
+
 (function () {
-  var storageKey = "daily-expense-tracker-records";
+  var appPanel = document.getElementById("appPanel");
+  var authPanel = document.getElementById("authPanel");
+  var loginForm = document.getElementById("loginForm");
+  var loginEmail = document.getElementById("loginEmail");
+  var loginPassword = document.getElementById("loginPassword");
+  var authMessage = document.getElementById("authMessage");
+  var userEmail = document.getElementById("userEmail");
+  var signOutButton = document.getElementById("signOutButton");
   var form = document.getElementById("expenseForm");
   var expenseId = document.getElementById("expenseId");
   var expenseDate = document.getElementById("expenseDate");
@@ -21,41 +60,120 @@
   var recordCount = document.getElementById("recordCount");
   var averageSpend = document.getElementById("averageSpend");
 
-  var expenses = loadExpenses();
+  var app;
+  var auth;
+  var db;
+  var currentUser = null;
+  var expenses = [];
+  var monthUnsubscribe = null;
+  var expenseUnsubscribes = [];
+  var editingMonthId = "";
 
   expenseDate.value = todayAsInput();
   render();
 
-  form.addEventListener("submit", function (event) {
+  if (firebaseConfig.apiKey.indexOf("PASTE_") === 0) {
+    authMessage.textContent = "Add your Firebase config in expense-tracker.js before signing in.";
+    loginForm.querySelector("button").disabled = true;
+  } else {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+
+    onAuthStateChanged(auth, function (user) {
+      currentUser = user;
+      if (user) {
+        userEmail.textContent = user.email || "";
+        authPanel.classList.add("hidden");
+        appPanel.classList.remove("hidden");
+        listenForSharedExpenses();
+      } else {
+        stopListening();
+        expenses = [];
+        render();
+        appPanel.classList.add("hidden");
+        authPanel.classList.remove("hidden");
+      }
+    });
+  }
+
+  loginForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+    authMessage.textContent = "Signing in...";
+    signInWithEmailAndPassword(auth, loginEmail.value.trim(), loginPassword.value)
+      .then(function () {
+        loginForm.reset();
+        authMessage.textContent = "";
+      })
+      .catch(function (error) {
+        authMessage.textContent = error.message;
+      });
+  });
+
+  signOutButton.addEventListener("click", function () {
+    signOut(auth);
+  });
+
+  form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
+    if (!currentUser) {
+      return;
+    }
+
+    var monthId = getMonthId(expenseDate.value);
     var record = {
-      id: expenseId.value || String(Date.now()),
       date: expenseDate.value,
       name: expenseName.value.trim(),
       amount: Number(expenseAmount.value),
       category: expenseCategory.value,
-      note: expenseNote.value.trim()
+      note: expenseNote.value.trim(),
+      monthId: monthId,
+      updatedAt: serverTimestamp(),
+      updatedBy: currentUser.uid
     };
 
     if (!record.date || !record.name || !record.amount || record.amount <= 0) {
       return;
     }
 
-    if (expenseId.value) {
-      expenses = expenses.map(function (item) {
-        return item.id === record.id ? record : item;
-      });
-    } else {
-      expenses.push(record);
-    }
+    submitButton.disabled = true;
+    authMessage.textContent = "";
 
-    saveExpenses();
-    resetForm();
-    render();
+    try {
+      await setDoc(monthDoc(monthId), {
+        label: formatMonthLabel(monthId),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+
+      if (expenseId.value) {
+        if (editingMonthId && editingMonthId !== monthId) {
+          await deleteDoc(expenseDoc(editingMonthId, expenseId.value));
+          await setDoc(expenseDoc(monthId, expenseId.value), {
+            ...record,
+            createdAt: serverTimestamp(),
+            createdBy: currentUser.uid
+          });
+        } else {
+          await updateDoc(expenseDoc(monthId, expenseId.value), record);
+        }
+      } else {
+        await addDoc(expenseCollection(monthId), {
+          ...record,
+          createdAt: serverTimestamp(),
+          createdBy: currentUser.uid
+        });
+      }
+
+      resetForm();
+    } catch (error) {
+      authMessage.textContent = friendlyFirebaseError(error);
+    } finally {
+      submitButton.disabled = false;
+    }
   });
 
-  rows.addEventListener("click", function (event) {
+  rows.addEventListener("click", async function (event) {
     var button = event.target.closest("button[data-action]");
     if (!button) {
       return;
@@ -76,11 +194,11 @@
     }
 
     if (action === "delete") {
-      expenses = expenses.filter(function (item) {
-        return item.id !== id;
-      });
-      saveExpenses();
-      render();
+      try {
+        await deleteDoc(expenseDoc(record.monthId, id));
+      } catch (error) {
+        authMessage.textContent = friendlyFirebaseError(error);
+      }
     }
   });
 
@@ -97,18 +215,6 @@
     render();
   });
 
-  function loadExpenses() {
-    try {
-      return JSON.parse(localStorage.getItem(storageKey)) || [];
-    } catch (error) {
-      return [];
-    }
-  }
-
-  function saveExpenses() {
-    localStorage.setItem(storageKey, JSON.stringify(expenses));
-  }
-
   function render() {
     var visibleExpenses = getFilteredExpenses();
     visibleExpenses.sort(function (a, b) {
@@ -116,12 +222,24 @@
     });
 
     rows.innerHTML = "";
+    var activeMonth = "";
     visibleExpenses.forEach(function (item) {
+      if (item.monthId !== activeMonth) {
+        activeMonth = item.monthId;
+        rows.appendChild(createMonthRow(activeMonth));
+      }
       rows.appendChild(createExpenseRow(item));
     });
 
     emptyState.classList.toggle("hidden", visibleExpenses.length > 0);
     updateSummary();
+  }
+
+  function createMonthRow(monthId) {
+    var row = document.createElement("tr");
+    row.className = "month-row";
+    row.innerHTML = "<td colspan=\"5\">" + escapeHtml(formatMonthLabel(monthId)) + "</td>";
+    return row;
   }
 
   function createExpenseRow(item) {
@@ -175,6 +293,7 @@
 
   function startEdit(record) {
     expenseId.value = record.id;
+    editingMonthId = record.monthId;
     expenseDate.value = record.date;
     expenseName.value = record.name;
     expenseAmount.value = record.amount;
@@ -189,10 +308,84 @@
   function resetForm() {
     form.reset();
     expenseId.value = "";
+    editingMonthId = "";
     expenseDate.value = todayAsInput();
     formTitle.textContent = "Add expense";
     submitButton.textContent = "Save expense";
     cancelEdit.classList.add("hidden");
+  }
+
+  function listenForSharedExpenses() {
+    stopListening();
+
+    monthUnsubscribe = onSnapshot(query(collection(db, "households", householdId, "months"), orderBy("label", "desc")), function (snapshot) {
+      expenseUnsubscribes.forEach(function (unsubscribe) {
+        unsubscribe();
+      });
+      expenseUnsubscribes = [];
+      expenses = [];
+      render();
+
+      snapshot.forEach(function (monthSnapshot) {
+        var monthId = monthSnapshot.id;
+        var unsubscribeExpenses = onSnapshot(query(expenseCollection(monthId), orderBy("date", "desc")), function (expenseSnapshot) {
+          expenses = expenses.filter(function (item) {
+            return item.monthId !== monthId;
+          });
+
+          expenseSnapshot.forEach(function (expenseSnapshotItem) {
+            expenses.push({
+              id: expenseSnapshotItem.id,
+              ...expenseSnapshotItem.data(),
+              monthId: monthId
+            });
+          });
+
+        render();
+      }, function (error) {
+        authMessage.textContent = friendlyFirebaseError(error);
+      });
+
+      expenseUnsubscribes.push(unsubscribeExpenses);
+    });
+    }, function (error) {
+      authMessage.textContent = friendlyFirebaseError(error);
+      stopListening();
+    });
+  }
+
+  function stopListening() {
+    if (monthUnsubscribe) {
+      monthUnsubscribe();
+      monthUnsubscribe = null;
+    }
+    expenseUnsubscribes.forEach(function (unsubscribe) {
+      unsubscribe();
+    });
+    expenseUnsubscribes = [];
+  }
+
+  function monthDoc(monthId) {
+    return doc(db, "households", householdId, "months", monthId);
+  }
+
+  function expenseCollection(monthId) {
+    return collection(db, "households", householdId, "months", monthId, "expenses");
+  }
+
+  function expenseDoc(monthId, id) {
+    return doc(db, "households", householdId, "months", monthId, "expenses", id);
+  }
+
+  function getMonthId(dateValue) {
+    return dateValue.slice(0, 7);
+  }
+
+  function formatMonthLabel(monthId) {
+    return new Date(monthId + "-01T00:00:00").toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "long"
+    });
   }
 
   function todayAsInput() {
@@ -224,6 +417,26 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
+  }
+
+  function friendlyFirebaseError(error) {
+    if (!error || !error.code) {
+      return "Firebase could not complete that action. Check your project setup.";
+    }
+
+    if (error.code === "permission-denied") {
+      return "Permission denied. Add this user's UID as a household member in Firestore.";
+    }
+
+    if (error.code === "auth/invalid-credential" || error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+      return "Email or password is incorrect.";
+    }
+
+    if (error.code === "failed-precondition") {
+      return "Firestore needs an index or setup change. Check the Firebase console message.";
+    }
+
+    return error.message || "Firebase could not complete that action.";
   }
 
 })();
