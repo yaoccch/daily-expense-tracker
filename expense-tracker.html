@@ -24,8 +24,8 @@
           Password
           <input id="loginPassword" type="password" autocomplete="current-password" required>
         </label>
-        <button type="submit" class="primary-button">Sign in</button>
-        <p id="authMessage" class="status-message" aria-live="polite"></p>
+        <button type="submit" id="loginButton" class="primary-button">Sign in</button>
+        <p id="authMessage" class="status-message auth-status" aria-live="polite">Loading app...</p>
       </form>
     </section>
 
@@ -36,14 +36,14 @@
         <h1 id="app-title">Expense Tracker</h1>
         <p class="signed-in">Signed in as <span id="userEmail"></span></p>
       </div>
-      <div class="month-total" aria-live="polite">
-        <span>Book total</span>
-        <strong id="monthTotal">$0.00</strong>
-        <button type="button" id="signOutButton" class="ghost-button sign-out-button">Sign out</button>
-      </div>
+      <button type="button" id="signOutButton" class="ghost-button sign-out-button">Sign out</button>
     </section>
 
     <section class="summary-grid" aria-label="Expense summary">
+      <article class="summary-card">
+        <span>Book total</span>
+        <strong id="monthTotal">$0.00</strong>
+      </article>
       <article class="summary-card">
         <span>Today</span>
         <strong id="todayTotal">$0.00</strong>
@@ -64,11 +64,53 @@
     </section>
 
     <section class="workspace">
-      <form id="expenseForm" class="expense-form">
+      <section class="records-panel" aria-labelledby="records-title">
+        <div class="records-toolbar">
+          <div>
+            <p class="eyebrow">Ledger</p>
+            <h2 id="records-title">Expense records</h2>
+            <p id="activeBookLabel" class="active-book-label">No book selected</p>
+          </div>
+          <button type="button" id="openExpenseModal" class="primary-button add-expense-button">Add expense</button>
+        </div>
+
+        <div class="filters" aria-label="Filter expenses">
+          <label>
+            Category
+            <select id="filterCategory">
+              <option value="All">All</option>
+              <option value="Food">Food</option>
+              <option value="Transport">Transport</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Bills">Bills</option>
+              <option value="Health">Health</option>
+              <option value="Other">Other</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="table-wrap">
+          <div id="expenseRows" class="expense-list"></div>
+          <p id="emptyState" class="empty-state">No expenses yet. Add your first daily record.</p>
+        </div>
+      </section>
+    </section>
+    <section class="book-create-panel">
+      <form id="bookForm" class="book-form">
+        <label>
+          New book
+          <input id="newBookMonth" type="month" required>
+        </label>
+        <button type="submit" class="primary-button">Create</button>
+      </form>
+    </section>
+
+    <div id="expenseModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="formTitle">
+      <form id="expenseForm" class="expense-form modal-panel">
         <input type="hidden" id="expenseId">
         <div class="form-header">
           <h2 id="formTitle">Add expense</h2>
-          <button type="button" id="cancelEdit" class="ghost-button hidden">Cancel</button>
+          <button type="button" id="cancelEdit" class="ghost-button">Close</button>
         </div>
 
         <label>
@@ -124,46 +166,7 @@
         <button type="submit" class="primary-button" id="submitButton">Save expense</button>
         <p id="appMessage" class="status-message app-message" aria-live="polite"></p>
       </form>
-
-      <section class="records-panel" aria-labelledby="records-title">
-        <div class="records-toolbar">
-          <div>
-            <p class="eyebrow">Ledger</p>
-            <h2 id="records-title">Expense records</h2>
-            <p id="activeBookLabel" class="active-book-label">No book selected</p>
-          </div>
-        </div>
-
-        <div class="filters" aria-label="Filter expenses">
-          <label>
-            Category
-            <select id="filterCategory">
-              <option value="All">All</option>
-              <option value="Food">Food</option>
-              <option value="Transport">Transport</option>
-              <option value="Shopping">Shopping</option>
-              <option value="Bills">Bills</option>
-              <option value="Health">Health</option>
-              <option value="Other">Other</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="table-wrap">
-          <div id="expenseRows" class="expense-list"></div>
-          <p id="emptyState" class="empty-state">No expenses yet. Add your first daily record.</p>
-        </div>
-      </section>
-    </section>
-    <section class="book-create-panel">
-      <form id="bookForm" class="book-form">
-        <label>
-          New book
-          <input id="newBookMonth" type="month" required>
-        </label>
-        <button type="submit" class="primary-button">Create</button>
-      </form>
-    </section>
+    </div>
     </section>
   </main>
 

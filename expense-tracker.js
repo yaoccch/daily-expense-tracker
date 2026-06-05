@@ -36,6 +36,7 @@ var householdId = "shared-household";
   var loginForm = document.getElementById("loginForm");
   var loginEmail = document.getElementById("loginEmail");
   var loginPassword = document.getElementById("loginPassword");
+  var loginButton = document.getElementById("loginButton");
   var authMessage = document.getElementById("authMessage");
   var userEmail = document.getElementById("userEmail");
   var signOutButton = document.getElementById("signOutButton");
@@ -44,6 +45,8 @@ var householdId = "shared-household";
   var bookList = document.getElementById("bookList");
   var expenseBook = document.getElementById("expenseBook");
   var activeBookLabel = document.getElementById("activeBookLabel");
+  var expenseModal = document.getElementById("expenseModal");
+  var openExpenseModal = document.getElementById("openExpenseModal");
   var form = document.getElementById("expenseForm");
   var expenseId = document.getElementById("expenseId");
   var expenseDate = document.getElementById("expenseDate");
@@ -85,6 +88,7 @@ var householdId = "shared-household";
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
     db = getFirestore(app);
+    setAuthStatus("Ready to sign in.", "");
 
     onAuthStateChanged(auth, function (user) {
       currentUser = user;
@@ -108,19 +112,37 @@ var householdId = "shared-household";
 
   loginForm.addEventListener("submit", function (event) {
     event.preventDefault();
-    authMessage.textContent = "Signing in...";
+    setAuthStatus("Signing in...", "");
+    loginButton.disabled = true;
+    loginButton.textContent = "Signing in...";
     signInWithEmailAndPassword(auth, loginEmail.value.trim(), loginPassword.value)
       .then(function () {
         loginForm.reset();
-        authMessage.textContent = "";
+        setAuthStatus("Signed in.", "success");
       })
       .catch(function (error) {
-        authMessage.textContent = error.message;
+        setAuthStatus(friendlyFirebaseError(error), "error");
+      })
+      .finally(function () {
+        loginButton.disabled = false;
+        loginButton.textContent = "Sign in";
       });
   });
 
   signOutButton.addEventListener("click", function () {
     signOut(auth);
+  });
+
+  openExpenseModal.addEventListener("click", function () {
+    resetForm();
+    openModal();
+  });
+
+  expenseModal.addEventListener("click", function (event) {
+    if (event.target === expenseModal) {
+      resetForm();
+      closeModal();
+    }
   });
 
   bookForm.addEventListener("submit", async function (event) {
@@ -203,6 +225,7 @@ var householdId = "shared-household";
 
       resetForm();
       setStatus("Expense saved to Firebase.", "success");
+      closeModal();
     } catch (error) {
       setStatus(friendlyFirebaseError(error), "error");
     } finally {
@@ -243,6 +266,7 @@ var householdId = "shared-household";
   filterCategory.addEventListener("input", render);
 
   cancelEdit.addEventListener("click", resetForm);
+  cancelEdit.addEventListener("click", closeModal);
 
   function render() {
     renderBooks();
@@ -338,7 +362,7 @@ var householdId = "shared-household";
     expenseNote.value = record.note || "";
     formTitle.textContent = "Edit expense";
     submitButton.textContent = "Update expense";
-    cancelEdit.classList.remove("hidden");
+    openModal();
     expenseName.focus();
   }
 
@@ -351,7 +375,19 @@ var householdId = "shared-household";
     setSelectedPayer("yc");
     formTitle.textContent = "Add expense";
     submitButton.textContent = "Save expense";
-    cancelEdit.classList.add("hidden");
+  }
+
+  function openModal() {
+    expenseModal.classList.remove("hidden");
+    document.body.classList.add("modal-open");
+    setTimeout(function () {
+      expenseName.focus();
+    }, 0);
+  }
+
+  function closeModal() {
+    expenseModal.classList.add("hidden");
+    document.body.classList.remove("modal-open");
   }
 
   function listenForSharedExpenses() {
@@ -578,6 +614,12 @@ var householdId = "shared-household";
     appMessage.textContent = message || "";
     appMessage.classList.toggle("status-error", type === "error");
     appMessage.classList.toggle("status-success", type === "success");
+  }
+
+  function setAuthStatus(message, type) {
+    authMessage.textContent = message || "";
+    authMessage.classList.toggle("status-error", type === "error");
+    authMessage.classList.toggle("status-success", type === "success");
   }
 
 })();

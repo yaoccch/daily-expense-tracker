@@ -129,7 +129,7 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 24px;
+  padding: 16px 18px;
   border-top: 5px solid var(--accent);
 }
 
@@ -153,37 +153,17 @@ h2 {
 }
 
 h1 {
-  font-size: clamp(2rem, 4vw, 3.35rem);
+  font-size: clamp(1.35rem, 3vw, 2rem);
 }
 
 h2 {
   font-size: 1.25rem;
 }
 
-.month-total {
-  min-width: 132px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  background: #edf8f6;
-  text-align: right;
-}
-
-.month-total .ghost-button {
-  width: 100%;
-}
-
-.month-total span,
 .summary-card span {
   display: block;
   color: var(--muted);
-  font-size: 0.92rem;
-}
-
-.month-total strong {
-  display: block;
-  margin-top: 6px;
-  color: var(--accent-dark);
-  font-size: 1.15rem;
+  font-size: 0.76rem;
 }
 
 .sign-out-button {
@@ -192,19 +172,19 @@ h2 {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 16px;
-  margin: 18px 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 10px 0;
 }
 
 .summary-card {
-  padding: 18px;
+  padding: 9px 11px;
 }
 
 .summary-card strong {
   display: block;
-  margin-top: 8px;
-  font-size: 1.15rem;
+  margin-top: 4px;
+  font-size: 0.95rem;
 }
 
 .book-panel {
@@ -263,15 +243,16 @@ h2 {
 }
 
 .workspace {
-  display: grid;
-  grid-template-columns: 360px minmax(0, 1fr);
-  gap: 18px;
-  align-items: start;
+  display: block;
 }
 
-.expense-form,
 .records-panel {
   padding: 20px;
+}
+
+.add-expense-button {
+  width: auto;
+  min-width: 118px;
 }
 
 .form-header,
@@ -290,8 +271,7 @@ h2 {
 }
 
 .expense-form {
-  position: sticky;
-  top: 16px;
+  padding: 20px;
 }
 
 .expense-form label,
@@ -535,6 +515,27 @@ textarea:focus {
   display: none !important;
 }
 
+.modal-open {
+  overflow: hidden;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  background: rgba(23, 32, 51, 0.42);
+  padding: 16px;
+}
+
+.modal-panel {
+  width: min(420px, 100%);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  box-shadow: 0 18px 60px rgba(23, 32, 51, 0.22);
+}
+
 @media (max-width: 860px) {
   .top-panel,
   .workspace,
@@ -546,19 +547,8 @@ textarea:focus {
     margin-top: 22px;
   }
 
-  .month-total {
-    margin-top: 18px;
-    min-width: 0;
-    text-align: left;
-  }
-
   .summary-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .expense-form {
-    position: static;
-    margin-bottom: 18px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .book-toolbar,
@@ -597,7 +587,6 @@ textarea:focus {
   }
 
   .top-panel,
-  .expense-form,
   .records-panel,
   .summary-card,
   .book-panel,
@@ -611,7 +600,7 @@ textarea:focus {
 
   .top-panel {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 104px;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: start;
     gap: 10px;
     border-top: 0;
@@ -642,23 +631,6 @@ textarea:focus {
     white-space: nowrap;
   }
 
-  .month-total {
-    margin-top: 0;
-    min-width: 0;
-    padding: 7px;
-    border-radius: 6px;
-    text-align: left;
-  }
-
-  .month-total span {
-    font-size: 0.68rem;
-  }
-
-  .month-total strong {
-    margin-top: 3px;
-    font-size: 0.8rem;
-  }
-
   .sign-out-button {
     margin-top: 6px;
     min-height: 26px;
@@ -668,8 +640,8 @@ textarea:focus {
 
   .summary-grid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
     margin: 10px 0;
     overflow: visible;
     padding: 0;
@@ -687,12 +659,23 @@ textarea:focus {
   }
 
   .book-panel,
-  .expense-form,
   .records-panel,
   .book-create-panel {
     width: 100%;
     max-width: 100vw;
     padding: 12px;
+  }
+
+  .modal-overlay {
+    align-items: end;
+    padding: 10px;
+  }
+
+  .modal-panel {
+    width: 100%;
+    max-height: calc(100vh - 20px);
+    border-radius: 8px;
+    padding: 14px;
   }
 
   .form-row {
