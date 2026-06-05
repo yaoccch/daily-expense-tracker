@@ -56,6 +56,7 @@ var householdId = "shared-household";
   var expenseAmount = document.getElementById("expenseAmount");
   var expenseCategory = document.getElementById("expenseCategory");
   var categoryField = document.getElementById("categoryField");
+  var payerToggle = document.querySelector(".payer-toggle");
   var descriptionPresetButtons = document.querySelectorAll("[data-description]");
   var expenseNote = document.getElementById("expenseNote");
   var appMessage = document.getElementById("appMessage");
@@ -182,6 +183,23 @@ var householdId = "shared-household";
 
   document.querySelectorAll("input[name=\"entryType\"]").forEach(function (control) {
     control.addEventListener("change", updateEntryLabels);
+  });
+
+  payerToggle.querySelectorAll("label").forEach(function (label) {
+    label.addEventListener("pointerdown", function (event) {
+      event.preventDefault();
+      var control = label.querySelector("input[name=\"expensePaidBy\"]");
+      if (control) {
+        setSelectedPayer(control.value);
+      }
+    });
+
+    label.addEventListener("click", function () {
+      var control = label.querySelector("input[name=\"expensePaidBy\"]");
+      if (control) {
+        setSelectedPayer(control.value);
+      }
+    });
   });
 
   descriptionPresetButtons.forEach(function (button) {
@@ -400,7 +418,6 @@ var householdId = "shared-household";
     expenseNote.value = record.note || "";
     updateEntryLabels();
     openModal();
-    expenseName.focus();
   }
 
   function resetForm() {
@@ -417,9 +434,6 @@ var householdId = "shared-household";
   function openModal() {
     expenseModal.classList.remove("hidden");
     document.body.classList.add("modal-open");
-    setTimeout(function () {
-      expenseName.focus();
-    }, 0);
   }
 
   function closeModal() {
