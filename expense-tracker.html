@@ -117,6 +117,14 @@
         </div>
 
         <label>
+          Paid by
+          <select id="expensePaidBy" required>
+            <option value="yc">yc</option>
+            <option value="yd">yd</option>
+          </select>
+        </label>
+
+        <label>
           Note
           <textarea id="expenseNote" rows="3" placeholder="Optional detail"></textarea>
         </label>
@@ -164,10 +172,11 @@
               <tr>
                 <th>Date</th>
                 <th>Description</th>
-            <th>Category</th>
-            <th class="amount-cell">Amount</th>
-            <th>Actions</th>
-          </tr>
+                <th>Category</th>
+                <th>Paid by</th>
+                <th class="amount-cell">Amount</th>
+                <th>Actions</th>
+              </tr>
             </thead>
             <tbody id="expenseRows"></tbody>
           </table>

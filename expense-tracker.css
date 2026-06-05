@@ -22,6 +22,7 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
 }
 
 button,
@@ -438,6 +439,18 @@ th {
   font-weight: 700;
 }
 
+.payer-pill {
+  display: inline-block;
+  min-width: 34px;
+  border-radius: 999px;
+  background: #f3f6f8;
+  color: var(--accent-dark);
+  padding: 5px 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: center;
+}
+
 .actions {
   display: flex;
   gap: 8px;
@@ -458,7 +471,7 @@ th {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 @media (max-width: 860px) {
@@ -534,15 +547,16 @@ th {
   }
 
   .summary-grid {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 10px;
     margin: 10px 0;
-    overflow-x: auto;
+    overflow: visible;
     padding: 0 10px 8px;
   }
 
   .summary-card {
-    min-width: 150px;
+    min-width: 0;
     border: 1px solid var(--line);
     border-radius: 8px;
   }
@@ -552,11 +566,16 @@ th {
   }
 
   .book-list {
-    margin: 0 -4px;
+    display: grid;
+    grid-template-columns: 1fr;
+    margin: 0;
+    overflow: visible;
+    padding: 0;
   }
 
   .book-button {
-    min-width: 148px;
+    min-width: 0;
+    width: 100%;
   }
 
   .form-row,
@@ -634,5 +653,9 @@ th {
 
   .actions {
     justify-content: flex-end;
+  }
+
+  .actions button {
+    flex: 1;
   }
 }

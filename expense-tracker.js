@@ -50,6 +50,7 @@ var householdId = "shared-household";
   var expenseName = document.getElementById("expenseName");
   var expenseAmount = document.getElementById("expenseAmount");
   var expenseCategory = document.getElementById("expenseCategory");
+  var expensePaidBy = document.getElementById("expensePaidBy");
   var expenseNote = document.getElementById("expenseNote");
   var appMessage = document.getElementById("appMessage");
   var rows = document.getElementById("expenseRows");
@@ -169,6 +170,7 @@ var householdId = "shared-household";
       name: expenseName.value.trim(),
       amount: Number(expenseAmount.value),
       category: expenseCategory.value,
+      paidBy: expensePaidBy.value,
       note: expenseNote.value.trim(),
       monthId: monthId,
       updatedAt: serverTimestamp(),
@@ -284,7 +286,7 @@ var householdId = "shared-household";
   function createMonthRow(monthId) {
     var row = document.createElement("tr");
     row.className = "month-row";
-    row.innerHTML = "<td colspan=\"5\">" + escapeHtml(formatMonthLabel(monthId)) + "</td>";
+    row.innerHTML = "<td colspan=\"6\">" + escapeHtml(formatMonthLabel(monthId)) + "</td>";
     return row;
   }
 
@@ -294,6 +296,7 @@ var householdId = "shared-household";
       "<td data-label=\"Date\">" + formatDate(item.date) + "</td>",
       "<td data-label=\"Description\"><div class=\"row-title\">" + escapeHtml(item.name) + "</div>" + renderNote(item.note) + "</td>",
       "<td data-label=\"Category\"><span class=\"tag\">" + escapeHtml(item.category) + "</span></td>",
+      "<td data-label=\"Paid by\"><span class=\"payer-pill\">" + escapeHtml(item.paidBy || "-") + "</span></td>",
       "<td data-label=\"Amount\" class=\"amount-cell\">" + formatMoney(item.amount) + "</td>",
       "<td data-label=\"Actions\"><div class=\"actions\">",
       "<button type=\"button\" class=\"ghost-button\" data-action=\"edit\" data-id=\"" + item.id + "\">Edit</button>",
@@ -347,6 +350,7 @@ var householdId = "shared-household";
     expenseName.value = record.name;
     expenseAmount.value = record.amount;
     expenseCategory.value = record.category;
+    expensePaidBy.value = record.paidBy || "yc";
     expenseNote.value = record.note || "";
     formTitle.textContent = "Edit expense";
     submitButton.textContent = "Update expense";
