@@ -641,20 +641,33 @@ textarea:focus {
 }
 
 .modal-panel {
+  position: relative;
   width: min(340px, calc(100vw - 16px));
   max-width: calc(100vw - 16px);
   max-height: calc(100vh - 16px);
   overflow-y: auto;
   overflow-x: hidden;
+  padding-top: 42px;
   box-shadow: 0 18px 60px rgba(23, 32, 51, 0.22);
 }
 
 .modal-panel .form-header {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: var(--panel);
   padding-bottom: 6px;
+}
+
+.modal-close-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 56px;
+  min-height: 28px;
+  padding: 4px 8px;
+  font-size: 0.78rem;
 }
 
 @media (max-width: 860px) {
@@ -829,6 +842,7 @@ textarea:focus {
     max-height: calc(100vh - 8px);
     border-radius: 8px;
     padding: 8px;
+    padding-top: 40px;
   }
 
   .modal-panel .form-header {
@@ -843,6 +857,11 @@ textarea:focus {
     min-height: 28px;
     padding: 4px 8px;
     font-size: 0.78rem;
+  }
+
+  .modal-close-button {
+    top: 6px;
+    right: 6px;
   }
 
   .form-row {

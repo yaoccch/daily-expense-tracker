@@ -55,7 +55,7 @@ var householdId = "shared-household";
   var expenseAmount = document.getElementById("expenseAmount");
   var expenseCategory = document.getElementById("expenseCategory");
   var categoryField = document.getElementById("categoryField");
-  var descriptionPresets = document.querySelector(".description-presets");
+  var descriptionPresetButtons = document.querySelectorAll("[data-description]");
   var expenseNote = document.getElementById("expenseNote");
   var appMessage = document.getElementById("appMessage");
   var rows = document.getElementById("expenseRows");
@@ -181,13 +181,15 @@ var householdId = "shared-household";
     control.addEventListener("change", updateEntryLabels);
   });
 
-  descriptionPresets.addEventListener("click", function (event) {
-    var button = event.target.closest("button[data-description]");
-    if (!button) {
-      return;
-    }
-    expenseName.value = button.getAttribute("data-description") || "";
-    expenseName.focus();
+  descriptionPresetButtons.forEach(function (button) {
+    button.addEventListener("pointerdown", function (event) {
+      event.preventDefault();
+      setDescriptionPreset(button);
+    });
+
+    button.addEventListener("click", function () {
+      setDescriptionPreset(button);
+    });
   });
 
   form.addEventListener("submit", async function (event) {
@@ -420,6 +422,12 @@ var householdId = "shared-household";
   function closeModal() {
     expenseModal.classList.add("hidden");
     document.body.classList.remove("modal-open");
+  }
+
+  function setDescriptionPreset(button) {
+    expenseName.value = button.getAttribute("data-description") || "";
+    expenseName.dispatchEvent(new Event("input", { bubbles: true }));
+    expenseName.focus();
   }
 
   function listenForSharedExpenses() {
