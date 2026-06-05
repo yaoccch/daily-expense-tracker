@@ -63,6 +63,7 @@
         Select book
         <select id="bookList" aria-label="Expense books"></select>
       </label>
+      <button type="button" id="deleteBookButton" class="danger-button delete-book-button">Delete book</button>
     </section>
 
     <section class="workspace">
@@ -109,7 +110,6 @@
 
     <div id="expenseModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="formTitle">
       <form id="expenseForm" class="expense-form modal-panel" novalidate>
-        <button type="button" id="cancelEdit" class="ghost-button modal-close-button">Close</button>
         <input type="hidden" id="expenseId">
         <div class="form-header">
           <h2 id="formTitle">Add expense</h2>
@@ -125,6 +125,7 @@
             <input type="radio" name="entryType" value="income">
             <span>Income</span>
           </label>
+          <button type="button" id="cancelEdit" class="ghost-button entry-close-button">Close</button>
         </fieldset>
 
         <button type="submit" class="primary-button" id="submitButton">Save expense</button>
