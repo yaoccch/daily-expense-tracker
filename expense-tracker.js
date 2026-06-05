@@ -53,6 +53,7 @@ var householdId = "shared-household";
   var expenseName = document.getElementById("expenseName");
   var expenseAmount = document.getElementById("expenseAmount");
   var expenseCategory = document.getElementById("expenseCategory");
+  var categoryField = document.getElementById("categoryField");
   var expenseNote = document.getElementById("expenseNote");
   var appMessage = document.getElementById("appMessage");
   var rows = document.getElementById("expenseRows");
@@ -188,7 +189,7 @@ var householdId = "shared-household";
       name: expenseName.value.trim(),
       amount: Number(expenseAmount.value),
       type: getSelectedEntryType(),
-      category: expenseCategory.value,
+      category: getSelectedEntryType() === "income" ? "Income" : expenseCategory.value,
       paidBy: getSelectedPayer(),
       note: expenseNote.value.trim(),
       monthId: monthId,
@@ -260,6 +261,9 @@ var householdId = "shared-household";
     }
 
     if (action === "delete") {
+      if (!window.confirm("Delete this entry?")) {
+        return;
+      }
       try {
         await deleteDoc(expenseDoc(record.monthId, id));
         setStatus("Expense deleted.", "success");
@@ -308,7 +312,7 @@ var householdId = "shared-household";
     row.innerHTML = [
       "<div class=\"expense-main\">",
       "<div class=\"row-title\">" + escapeHtml(item.name) + "</div>",
-      "<div class=\"row-meta\">" + renderCategory(item.category) + " · " + escapeHtml(item.paidBy || "-") + renderNoteText(item.note) + "</div>",
+      "<div class=\"row-meta\">" + renderEntryMeta(item) + "</div>",
       "</div>",
       "<div class=\"expense-side\">",
       "<strong class=\"" + amountClass(item) + "\">" + formatSignedMoney(item) + "</strong>",
@@ -332,7 +336,7 @@ var householdId = "shared-household";
   function getFilteredExpenses() {
     return expenses.filter(function (item) {
       var bookMatches = !selectedMonthId || item.monthId === selectedMonthId;
-      var categoryMatches = filterCategory.value === "All" || item.category === filterCategory.value;
+      var categoryMatches = getEntryType(item) === "income" || filterCategory.value === "All" || item.category === filterCategory.value;
       return bookMatches && categoryMatches;
     });
   }
@@ -367,7 +371,7 @@ var householdId = "shared-household";
     expenseName.value = record.name;
     expenseAmount.value = record.amount;
     setSelectedEntryType(getEntryType(record));
-    expenseCategory.value = record.category;
+    expenseCategory.value = record.category === "Income" ? "Other" : record.category;
     setSelectedPayer(record.paidBy || "yc");
     expenseNote.value = record.note || "";
     updateEntryLabels();
@@ -519,7 +523,7 @@ var householdId = "shared-household";
 
       var bookOption = document.createElement("option");
       bookOption.value = month.id;
-      bookOption.textContent = month.label + " - " + formatMoney(totalForMonth(month.id));
+      bookOption.textContent = month.label + " - " + formatMoney(netTotalForMonth(month.id));
       bookList.appendChild(bookOption);
     });
 
@@ -528,10 +532,14 @@ var householdId = "shared-household";
     activeBookLabel.textContent = selectedMonthId ? formatMonthLabel(selectedMonthId) : "No book selected";
   }
 
-  function totalForMonth(monthId) {
-    return expenses.filter(function (item) {
-      return item.monthId === monthId;
+  function netTotalForMonth(monthId) {
+    var income = expenses.filter(function (item) {
+      return item.monthId === monthId && getEntryType(item) === "income";
     }).reduce(sumAmount, 0);
+    var expense = expenses.filter(function (item) {
+      return item.monthId === monthId && getEntryType(item) === "expense";
+    }).reduce(sumAmount, 0);
+    return income - expense;
   }
 
   function getSelectedPayer() {
@@ -566,7 +574,7 @@ var householdId = "shared-household";
   }
 
   function renderCategory(category) {
-    return "<span class=\"category-with-icon\"><span class=\"category-icon category-" + escapeHtml(categorySlug(category)) + "\"></span>" + escapeHtml(category || "Other") + "</span>";
+    return "<span class=\"category-with-icon\"><span class=\"category-icon category-" + escapeHtml(categorySlug(category)) + "\" aria-hidden=\"true\"></span>" + escapeHtml(category || "Other") + "</span>";
   }
 
   function categorySlug(category) {
@@ -578,6 +586,21 @@ var householdId = "shared-household";
     var isEditing = Boolean(expenseId.value);
     formTitle.textContent = (isEditing ? "Edit " : "Add ") + type;
     submitButton.textContent = (isEditing ? "Update " : "Save ") + type;
+    categoryField.classList.toggle("hidden", type === "income");
+  }
+
+  function renderEntryMeta(item) {
+    var parts = [];
+    if (getEntryType(item) === "income") {
+      parts.push("<span class=\"category-with-icon\"><span class=\"category-icon category-income\" aria-hidden=\"true\"></span>Income</span>");
+    } else {
+      parts.push(renderCategory(item.category));
+    }
+    parts.push(escapeHtml(item.paidBy || "-"));
+    if (item.note) {
+      parts.push(escapeHtml(item.note));
+    }
+    return parts.join(" · ");
   }
 
   function setSelectedPayer(value) {

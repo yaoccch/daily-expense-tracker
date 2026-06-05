@@ -32,7 +32,6 @@
     <section id="appPanel" class="hidden">
     <section class="top-panel" aria-labelledby="app-title">
       <div>
-        <p class="eyebrow">Daily records</p>
         <h1 id="app-title">Expense Tracker</h1>
         <p class="signed-in">Signed in as <span id="userEmail"></span></p>
       </div>
@@ -57,11 +56,10 @@
     <section class="book-panel" aria-labelledby="book-title">
       <div class="book-toolbar">
         <div>
-          <p class="eyebrow">Monthly books</p>
-          <h2 id="book-title">Expense books</h2>
+          <h2 id="book-title">Book</h2>
         </div>
       </div>
-      <label class="book-select-label">
+      <label class="book-select-label inline-select-label">
         Select book
         <select id="bookList" aria-label="Expense books"></select>
       </label>
@@ -71,8 +69,7 @@
       <section class="records-panel" aria-labelledby="records-title">
         <div class="records-toolbar">
           <div>
-            <p class="eyebrow">Ledger</p>
-            <h2 id="records-title">Expense records</h2>
+            <h2 id="records-title">Records</h2>
             <p id="activeBookLabel" class="active-book-label">No book selected</p>
           </div>
           <button type="button" id="openExpenseModal" class="primary-button add-expense-button">Add expense</button>
@@ -142,7 +139,7 @@
 
         <label>
           Description
-          <input id="expenseName" type="text" placeholder="Lunch, fuel, groceries" maxlength="80" required>
+          <input id="expenseName" type="text" maxlength="80" required>
         </label>
 
         <div class="form-row">
@@ -150,7 +147,7 @@
             Amount
             <input id="expenseAmount" type="number" min="0.01" step="0.01" placeholder="0.00" required>
           </label>
-          <label>
+          <label id="categoryField">
             Category
             <select id="expenseCategory" required>
               <option value="Food">Food</option>

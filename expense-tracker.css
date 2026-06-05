@@ -241,6 +241,11 @@ h2 {
   font-weight: 700;
 }
 
+.inline-select-label {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+}
+
 .active-book-label {
   margin: 6px 0 0;
   color: var(--muted);
@@ -353,9 +358,9 @@ textarea:focus {
 }
 
 .danger-button {
-  background: #fff5f5;
-  border-color: #f3b7b0;
-  color: var(--danger);
+  background: #fff;
+  border-color: var(--line);
+  color: var(--ink);
 }
 
 .payer-toggle,
@@ -496,36 +501,44 @@ textarea:focus {
 }
 
 .category-icon {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #94a3b8;
+  display: inline-grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 6px;
+  background: #f1f5f9;
   flex: 0 0 auto;
+  font-size: 0.72rem;
+  line-height: 1;
 }
 
-.category-food {
-  background: #f59e0b;
+.category-icon::before {
+  content: "$";
 }
 
-.category-transport {
-  background: #0ea5e9;
+.category-food::before {
+  content: "🍽";
 }
 
-.category-shopping {
-  background: #a855f7;
+.category-transport::before {
+  content: "↗";
 }
 
-.category-bills {
-  background: #64748b;
+.category-shopping::before {
+  content: "🛒";
 }
 
-.category-health {
-  background: #ef4444;
+.category-bills::before {
+  content: "▣";
 }
 
-.category-salary {
-  background: var(--income);
+.category-health::before {
+  content: "+";
+}
+
+.category-salary::before,
+.category-income::before {
+  content: "$";
 }
 
 .tag {
