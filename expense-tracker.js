@@ -42,6 +42,7 @@ var householdId = "shared-household";
   var signOutButton = document.getElementById("signOutButton");
   var bookForm = document.getElementById("bookForm");
   var newBookMonth = document.getElementById("newBookMonth");
+  var bookMessage = document.getElementById("bookMessage");
   var bookList = document.getElementById("bookList");
   var expenseBook = document.getElementById("expenseBook");
   var activeBookLabel = document.getElementById("activeBookLabel");
@@ -78,8 +79,6 @@ var householdId = "shared-household";
   var editingMonthId = "";
 
   expenseDate.value = todayAsInput();
-  expenseDate.min = selectedMonthId + "-01";
-  expenseDate.max = lastDateForMonth(selectedMonthId);
   newBookMonth.value = selectedMonthId;
   render();
 
@@ -154,13 +153,18 @@ var householdId = "shared-household";
       return;
     }
 
+    if (!isValidMonth(newBookMonth.value)) {
+      setBookStatus("Use month format YYYY-MM, for example 2026-06.", "error");
+      return;
+    }
+
     try {
-      setStatus("Creating book...", "");
+      setBookStatus("Creating book...", "");
       await ensureMonthBook(newBookMonth.value);
       selectMonthBook(newBookMonth.value);
-      setStatus("Book is ready.", "success");
+      setBookStatus("Book is ready.", "success");
     } catch (error) {
-      setStatus(friendlyFirebaseError(error), "error");
+      setBookStatus(friendlyFirebaseError(error), "error");
     }
   });
 
@@ -180,6 +184,11 @@ var householdId = "shared-household";
     event.preventDefault();
 
     if (!currentUser) {
+      return;
+    }
+
+    if (!isValidDate(expenseDate.value)) {
+      setStatus("Use date format YYYY-MM-DD, for example 2026-06-05.", "error");
       return;
     }
 
@@ -495,8 +504,6 @@ var householdId = "shared-household";
     if (!expenseDate.value || expenseDate.value.slice(0, 7) !== monthId) {
       expenseDate.value = defaultDateForMonth(monthId);
     }
-    expenseDate.min = monthId + "-01";
-    expenseDate.max = lastDateForMonth(monthId);
     render();
   }
 
@@ -618,13 +625,6 @@ var householdId = "shared-household";
     return monthId + "-01";
   }
 
-  function lastDateForMonth(monthId) {
-    var parts = monthId.split("-");
-    var year = Number(parts[0]);
-    var month = Number(parts[1]);
-    return new Date(year, month, 0).toISOString().slice(0, 10);
-  }
-
   function formatMonthLabel(monthId) {
     return new Date(monthId + "-01T00:00:00").toLocaleDateString("en-US", {
       year: "numeric",
@@ -637,6 +637,26 @@ var householdId = "shared-household";
     var offset = now.getTimezoneOffset();
     var localDate = new Date(now.getTime() - offset * 60000);
     return localDate.toISOString().slice(0, 10);
+  }
+
+  function isValidMonth(value) {
+    if (!/^\d{4}-\d{2}$/.test(value || "")) {
+      return false;
+    }
+    var month = Number(value.slice(5, 7));
+    return month >= 1 && month <= 12;
+  }
+
+  function isValidDate(value) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value || "")) {
+      return false;
+    }
+    var parts = value.split("-");
+    var year = Number(parts[0]);
+    var month = Number(parts[1]);
+    var day = Number(parts[2]);
+    var date = new Date(year, month - 1, day);
+    return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
   }
 
   function formatDate(value) {
@@ -687,6 +707,12 @@ var householdId = "shared-household";
     appMessage.textContent = message || "";
     appMessage.classList.toggle("status-error", type === "error");
     appMessage.classList.toggle("status-success", type === "success");
+  }
+
+  function setBookStatus(message, type) {
+    bookMessage.textContent = message || "";
+    bookMessage.classList.toggle("status-error", type === "error");
+    bookMessage.classList.toggle("status-success", type === "success");
   }
 
   function setAuthStatus(message, type) {

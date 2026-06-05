@@ -97,17 +97,18 @@
       </section>
     </section>
     <section class="book-create-panel">
-      <form id="bookForm" class="book-form">
+      <form id="bookForm" class="book-form" novalidate>
         <label>
           New book
-          <input id="newBookMonth" type="month" lang="en" required>
+          <input id="newBookMonth" type="text" inputmode="numeric" placeholder="YYYY-MM" pattern="\d{4}-\d{2}" autocomplete="off" required>
         </label>
         <button type="submit" class="primary-button">Create</button>
+        <p id="bookMessage" class="status-message book-message" aria-live="polite"></p>
       </form>
     </section>
 
     <div id="expenseModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="formTitle">
-      <form id="expenseForm" class="expense-form modal-panel">
+      <form id="expenseForm" class="expense-form modal-panel" novalidate>
         <input type="hidden" id="expenseId">
         <div class="form-header">
           <h2 id="formTitle">Add expense</h2>
@@ -133,7 +134,7 @@
 
         <label>
           Date
-          <input id="expenseDate" type="date" lang="en" required>
+          <input id="expenseDate" type="text" inputmode="numeric" placeholder="YYYY-MM-DD" pattern="\d{4}-\d{2}-\d{2}" autocomplete="off" required>
         </label>
 
         <label>
