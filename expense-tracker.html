@@ -37,7 +37,7 @@
         <p class="signed-in">Signed in as <span id="userEmail"></span></p>
       </div>
       <div class="month-total" aria-live="polite">
-        <span>This month</span>
+        <span>Book total</span>
         <strong id="monthTotal">$0.00</strong>
         <button type="button" id="signOutButton" class="ghost-button sign-out-button">Sign out</button>
       </div>
@@ -48,14 +48,6 @@
         <span>Today</span>
         <strong id="todayTotal">$0.00</strong>
       </article>
-      <article class="summary-card">
-        <span>All records</span>
-        <strong id="recordCount">0</strong>
-      </article>
-      <article class="summary-card">
-        <span>Average</span>
-        <strong id="averageSpend">$0.00</strong>
-      </article>
     </section>
 
     <section class="book-panel" aria-labelledby="book-title">
@@ -64,6 +56,9 @@
           <p class="eyebrow">Monthly books</p>
           <h2 id="book-title">Expense books</h2>
         </div>
+      </div>
+      <div id="bookList" class="book-list" aria-label="Expense books"></div>
+      <div class="book-create-panel">
         <form id="bookForm" class="book-form">
           <label>
             New book
@@ -72,7 +67,6 @@
           <button type="submit" class="primary-button">Create</button>
         </form>
       </div>
-      <div id="bookList" class="book-list" aria-label="Expense books"></div>
     </section>
 
     <section class="workspace">
@@ -116,13 +110,17 @@
           </label>
         </div>
 
-        <label>
-          Paid by
-          <select id="expensePaidBy" required>
-            <option value="yc">yc</option>
-            <option value="yd">yd</option>
-          </select>
-        </label>
+        <fieldset class="payer-toggle">
+          <legend>Paid by</legend>
+          <label>
+            <input type="radio" name="expensePaidBy" value="yc" checked>
+            <span>yc</span>
+          </label>
+          <label>
+            <input type="radio" name="expensePaidBy" value="yd">
+            <span>yd</span>
+          </label>
+        </fieldset>
 
         <label>
           Note
@@ -144,14 +142,6 @@
 
         <div class="filters" aria-label="Filter expenses">
           <label>
-            From
-            <input id="filterFrom" type="date">
-          </label>
-          <label>
-            To
-            <input id="filterTo" type="date">
-          </label>
-          <label>
             Category
             <select id="filterCategory">
               <option value="All">All</option>
@@ -163,7 +153,6 @@
               <option value="Other">Other</option>
             </select>
           </label>
-          <button type="button" id="clearFilters" class="ghost-button">Clear</button>
         </div>
 
         <div class="table-wrap">

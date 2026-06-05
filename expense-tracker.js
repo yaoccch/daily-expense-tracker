@@ -50,7 +50,6 @@ var householdId = "shared-household";
   var expenseName = document.getElementById("expenseName");
   var expenseAmount = document.getElementById("expenseAmount");
   var expenseCategory = document.getElementById("expenseCategory");
-  var expensePaidBy = document.getElementById("expensePaidBy");
   var expenseNote = document.getElementById("expenseNote");
   var appMessage = document.getElementById("appMessage");
   var rows = document.getElementById("expenseRows");
@@ -58,14 +57,9 @@ var householdId = "shared-household";
   var formTitle = document.getElementById("formTitle");
   var submitButton = document.getElementById("submitButton");
   var cancelEdit = document.getElementById("cancelEdit");
-  var filterFrom = document.getElementById("filterFrom");
-  var filterTo = document.getElementById("filterTo");
   var filterCategory = document.getElementById("filterCategory");
-  var clearFilters = document.getElementById("clearFilters");
   var todayTotal = document.getElementById("todayTotal");
   var monthTotal = document.getElementById("monthTotal");
-  var recordCount = document.getElementById("recordCount");
-  var averageSpend = document.getElementById("averageSpend");
 
   var app;
   var auth;
@@ -170,7 +164,7 @@ var householdId = "shared-household";
       name: expenseName.value.trim(),
       amount: Number(expenseAmount.value),
       category: expenseCategory.value,
-      paidBy: expensePaidBy.value,
+      paidBy: getSelectedPayer(),
       note: expenseNote.value.trim(),
       monthId: monthId,
       updatedAt: serverTimestamp(),
@@ -249,18 +243,9 @@ var householdId = "shared-household";
     }
   });
 
-  [filterFrom, filterTo, filterCategory].forEach(function (control) {
-    control.addEventListener("input", render);
-  });
+  filterCategory.addEventListener("input", render);
 
   cancelEdit.addEventListener("click", resetForm);
-
-  clearFilters.addEventListener("click", function () {
-    filterFrom.value = "";
-    filterTo.value = "";
-    filterCategory.value = "All";
-    render();
-  });
 
   function render() {
     renderBooks();
@@ -313,10 +298,8 @@ var householdId = "shared-household";
   function getFilteredExpenses() {
     return expenses.filter(function (item) {
       var bookMatches = !selectedMonthId || item.monthId === selectedMonthId;
-      var fromMatches = !filterFrom.value || item.date >= filterFrom.value;
-      var toMatches = !filterTo.value || item.date <= filterTo.value;
       var categoryMatches = filterCategory.value === "All" || item.category === filterCategory.value;
-      return bookMatches && fromMatches && toMatches && categoryMatches;
+      return bookMatches && categoryMatches;
     });
   }
 
@@ -324,7 +307,6 @@ var householdId = "shared-household";
     var today = todayAsInput();
     var visibleExpenses = getFilteredExpenses();
     var month = selectedMonthId || today.slice(0, 7);
-    var allTotal = visibleExpenses.reduce(sumAmount, 0);
     var monthSum = expenses.filter(function (item) {
       return item.monthId === month;
     }).reduce(sumAmount, 0);
@@ -334,8 +316,6 @@ var householdId = "shared-household";
 
     todayTotal.textContent = formatMoney(todaySum);
     monthTotal.textContent = formatMoney(monthSum);
-    recordCount.textContent = String(visibleExpenses.length);
-    averageSpend.textContent = formatMoney(visibleExpenses.length ? allTotal / visibleExpenses.length : 0);
   }
 
   function sumAmount(total, item) {
@@ -350,7 +330,7 @@ var householdId = "shared-household";
     expenseName.value = record.name;
     expenseAmount.value = record.amount;
     expenseCategory.value = record.category;
-    expensePaidBy.value = record.paidBy || "yc";
+    setSelectedPayer(record.paidBy || "yc");
     expenseNote.value = record.note || "";
     formTitle.textContent = "Edit expense";
     submitButton.textContent = "Update expense";
@@ -364,6 +344,7 @@ var householdId = "shared-household";
     editingMonthId = "";
     expenseBook.value = selectedMonthId;
     expenseDate.value = defaultDateForMonth(selectedMonthId);
+    setSelectedPayer("yc");
     formTitle.textContent = "Add expense";
     submitButton.textContent = "Save expense";
     cancelEdit.classList.add("hidden");
@@ -503,6 +484,18 @@ var householdId = "shared-household";
     return expenses.filter(function (item) {
       return item.monthId === monthId;
     }).reduce(sumAmount, 0);
+  }
+
+  function getSelectedPayer() {
+    var selected = document.querySelector("input[name=\"expensePaidBy\"]:checked");
+    return selected ? selected.value : "yc";
+  }
+
+  function setSelectedPayer(value) {
+    var selected = document.querySelector("input[name=\"expensePaidBy\"][value=\"" + value + "\"]");
+    if (selected) {
+      selected.checked = true;
+    }
   }
 
   function defaultDateForMonth(monthId) {

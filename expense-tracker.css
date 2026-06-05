@@ -143,8 +143,8 @@ h2 {
 }
 
 .month-total {
-  min-width: 180px;
-  padding: 16px 18px;
+  min-width: 150px;
+  padding: 14px 16px;
   border-radius: 8px;
   background: #edf8f6;
   text-align: right;
@@ -161,7 +161,7 @@ h2 {
   display: block;
   margin-top: 6px;
   color: var(--accent-dark);
-  font-size: 1.8rem;
+  font-size: 1.55rem;
 }
 
 .sign-out-button {
@@ -170,7 +170,7 @@ h2 {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   margin: 18px 0;
 }
@@ -192,10 +192,16 @@ h2 {
 
 .book-toolbar {
   display: flex;
-  align-items: end;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 14px;
+}
+
+.book-create-panel {
+  border-top: 1px solid var(--line);
+  margin-top: 12px;
+  padding-top: 14px;
 }
 
 .book-form {
@@ -321,6 +327,7 @@ textarea {
   background: #fff;
   color: var(--ink);
   padding: 11px 12px;
+  min-width: 0;
 }
 
 textarea {
@@ -372,6 +379,50 @@ textarea:focus {
   color: var(--danger);
 }
 
+.payer-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  border: 0;
+  margin: 0 0 14px;
+  padding: 0;
+}
+
+.payer-toggle legend {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 7px;
+}
+
+.payer-toggle label {
+  margin: 0;
+}
+
+.payer-toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.payer-toggle span {
+  display: grid;
+  min-height: 42px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.payer-toggle input:checked + span {
+  border-color: var(--accent);
+  background: #edf8f6;
+  color: var(--accent-dark);
+}
+
 .filters {
   align-items: end;
   flex-wrap: wrap;
@@ -391,7 +442,8 @@ textarea:focus {
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 720px;
+  min-width: 0;
+  table-layout: fixed;
 }
 
 th,
@@ -400,6 +452,7 @@ td {
   padding: 13px 10px;
   text-align: left;
   vertical-align: top;
+  overflow-wrap: anywhere;
 }
 
 th {
@@ -487,6 +540,7 @@ th {
 
   .month-total {
     margin-top: 18px;
+    min-width: 0;
     text-align: left;
   }
 
@@ -552,7 +606,7 @@ th {
     gap: 10px;
     margin: 10px 0;
     overflow: visible;
-    padding: 0 10px 8px;
+    padding: 0;
   }
 
   .summary-card {
