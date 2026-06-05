@@ -140,11 +140,8 @@ var householdId = "shared-household";
     }
   });
 
-  bookList.addEventListener("click", function (event) {
-    var button = event.target.closest("button[data-month-id]");
-    if (button) {
-      selectMonthBook(button.getAttribute("data-month-id"));
-    }
+  bookList.addEventListener("change", function () {
+    selectMonthBook(bookList.value);
   });
 
   expenseBook.addEventListener("change", function () {
@@ -255,11 +252,11 @@ var householdId = "shared-household";
     });
 
     rows.innerHTML = "";
-    var activeMonth = "";
+    var activeDate = "";
     visibleExpenses.forEach(function (item) {
-      if (item.monthId !== activeMonth) {
-        activeMonth = item.monthId;
-        rows.appendChild(createMonthRow(activeMonth));
+      if (item.date !== activeDate) {
+        activeDate = item.date;
+        rows.appendChild(createDayGroup(activeDate));
       }
       rows.appendChild(createExpenseRow(item));
     });
@@ -268,31 +265,38 @@ var householdId = "shared-household";
     updateSummary();
   }
 
-  function createMonthRow(monthId) {
-    var row = document.createElement("tr");
-    row.className = "month-row";
-    row.innerHTML = "<td colspan=\"6\">" + escapeHtml(formatMonthLabel(monthId)) + "</td>";
-    return row;
+  function createDayGroup(dateValue) {
+    var group = document.createElement("div");
+    group.className = "day-group";
+    group.textContent = formatDate(dateValue);
+    return group;
   }
 
   function createExpenseRow(item) {
-    var row = document.createElement("tr");
+    var row = document.createElement("article");
+    row.className = "expense-row";
     row.innerHTML = [
-      "<td data-label=\"Date\">" + formatDate(item.date) + "</td>",
-      "<td data-label=\"Description\"><div class=\"row-title\">" + escapeHtml(item.name) + "</div>" + renderNote(item.note) + "</td>",
-      "<td data-label=\"Category\"><span class=\"tag\">" + escapeHtml(item.category) + "</span></td>",
-      "<td data-label=\"Paid by\"><span class=\"payer-pill\">" + escapeHtml(item.paidBy || "-") + "</span></td>",
-      "<td data-label=\"Amount\" class=\"amount-cell\">" + formatMoney(item.amount) + "</td>",
-      "<td data-label=\"Actions\"><div class=\"actions\">",
+      "<div class=\"expense-main\">",
+      "<div class=\"row-title\">" + escapeHtml(item.name) + "</div>",
+      "<div class=\"row-meta\">" + escapeHtml(item.category) + " · " + escapeHtml(item.paidBy || "-") + renderNoteText(item.note) + "</div>",
+      "</div>",
+      "<div class=\"expense-side\">",
+      "<strong>" + formatMoney(item.amount) + "</strong>",
+      "<div class=\"actions\">",
       "<button type=\"button\" class=\"ghost-button\" data-action=\"edit\" data-id=\"" + item.id + "\">Edit</button>",
       "<button type=\"button\" class=\"danger-button\" data-action=\"delete\" data-id=\"" + item.id + "\">Delete</button>",
-      "</div></td>"
+      "</div>",
+      "</div>"
     ].join("");
     return row;
   }
 
   function renderNote(note) {
     return note ? "<div class=\"row-note\">" + escapeHtml(note) + "</div>" : "";
+  }
+
+  function renderNoteText(note) {
+    return note ? " · " + escapeHtml(note) : "";
   }
 
   function getFilteredExpenses() {
@@ -468,15 +472,14 @@ var householdId = "shared-household";
       option.textContent = month.label;
       expenseBook.appendChild(option);
 
-      var button = document.createElement("button");
-      button.type = "button";
-      button.className = "book-button" + (month.id === selectedMonthId ? " active" : "");
-      button.setAttribute("data-month-id", month.id);
-      button.innerHTML = "<span>" + escapeHtml(month.label) + "</span><strong>" + formatMoney(totalForMonth(month.id)) + "</strong>";
-      bookList.appendChild(button);
+      var bookOption = document.createElement("option");
+      bookOption.value = month.id;
+      bookOption.textContent = month.label + " - " + formatMoney(totalForMonth(month.id));
+      bookList.appendChild(bookOption);
     });
 
     expenseBook.value = selectedMonthId;
+    bookList.value = selectedMonthId;
     activeBookLabel.textContent = selectedMonthId ? formatMonthLabel(selectedMonthId) : "No book selected";
   }
 

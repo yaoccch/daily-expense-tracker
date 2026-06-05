@@ -57,16 +57,10 @@
           <h2 id="book-title">Expense books</h2>
         </div>
       </div>
-      <div id="bookList" class="book-list" aria-label="Expense books"></div>
-      <div class="book-create-panel">
-        <form id="bookForm" class="book-form">
-          <label>
-            New book
-            <input id="newBookMonth" type="month" required>
-          </label>
-          <button type="submit" class="primary-button">Create</button>
-        </form>
-      </div>
+      <label class="book-select-label">
+        Select book
+        <select id="bookList" aria-label="Expense books"></select>
+      </label>
     </section>
 
     <section class="workspace">
@@ -156,22 +150,19 @@
         </div>
 
         <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Category</th>
-                <th>Paid by</th>
-                <th class="amount-cell">Amount</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="expenseRows"></tbody>
-          </table>
+          <div id="expenseRows" class="expense-list"></div>
           <p id="emptyState" class="empty-state">No expenses yet. Add your first daily record.</p>
         </div>
       </section>
+    </section>
+    <section class="book-create-panel">
+      <form id="bookForm" class="book-form">
+        <label>
+          New book
+          <input id="newBookMonth" type="month" required>
+        </label>
+        <button type="submit" class="primary-button">Create</button>
+      </form>
     </section>
     </section>
   </main>
