@@ -173,7 +173,7 @@ h2 {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
   margin: 6px 0;
 }
@@ -188,7 +188,8 @@ h2 {
   font-size: 0.95rem;
 }
 
-#incomeTotal {
+#incomeTotal,
+#balanceTotal {
   color: var(--income);
 }
 
@@ -718,7 +719,7 @@ textarea:focus {
   }
 
   .summary-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .book-toolbar,
@@ -830,7 +831,7 @@ textarea:focus {
 
   .summary-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 6px;
     margin: 6px 0;
     overflow: visible;
@@ -950,3 +951,103 @@ textarea:focus {
   }
 }
 
+
+
+.summary-action-panel {
+  margin-top: 12px;
+}
+
+.summary-button {
+  max-width: 180px;
+}
+
+.summary-modal-panel {
+  padding: 16px;
+}
+
+.summary-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.summary-mode-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  border: 0;
+  margin: 0 0 14px;
+  padding: 0;
+}
+
+.summary-mode-toggle legend {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.summary-mode-toggle label {
+  position: relative;
+  display: block;
+  cursor: pointer;
+}
+
+.summary-mode-toggle input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  clip-path: inset(50%);
+}
+
+.summary-mode-toggle span {
+  display: grid;
+  min-height: 40px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  font-weight: 700;
+}
+
+.summary-mode-toggle input:checked + span {
+  border-color: var(--accent);
+  background: #eff6ff;
+  color: var(--accent-dark);
+}
+
+.summary-chart {
+  width: min(220px, 70vw);
+  aspect-ratio: 1;
+  margin: 10px auto 16px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+}
+
+.summary-legend {
+  display: grid;
+  gap: 8px;
+}
+
+.summary-legend-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+}
+
+.summary-legend-row strong {
+  white-space: nowrap;
+}
+
+.summary-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+}

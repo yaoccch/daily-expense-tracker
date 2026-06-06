@@ -47,6 +47,12 @@ var householdId = "shared-household";
   var expenseBook = document.getElementById("expenseBook");
   var activeBookLabel = document.getElementById("activeBookLabel");
   var expenseModal = document.getElementById("expenseModal");
+  var summaryModal = document.getElementById("summaryModal");
+  var openSummaryModal = document.getElementById("openSummaryModal");
+  var closeSummaryModal = document.getElementById("closeSummaryModal");
+  var summaryChart = document.getElementById("summaryChart");
+  var summaryLegend = document.getElementById("summaryLegend");
+  var summaryEmpty = document.getElementById("summaryEmpty");
   var openExpenseModal = document.getElementById("openExpenseModal");
   var form = document.getElementById("expenseForm");
   var expenseId = document.getElementById("expenseId");
@@ -68,6 +74,8 @@ var householdId = "shared-household";
   var todayTotal = document.getElementById("todayTotal");
   var monthTotal = document.getElementById("monthTotal");
   var incomeTotal = document.getElementById("incomeTotal");
+  var balanceTotal = document.getElementById("balanceTotal");
+  var chartColors = ["#2563eb", "#16a34a", "#f59e0b", "#dc2626", "#7c3aed", "#0891b2", "#be185d", "#64748b"];
 
   var app;
   var auth;
@@ -148,6 +156,22 @@ var householdId = "shared-household";
     }
   });
 
+
+  openSummaryModal.addEventListener("click", function () {
+    openSummary();
+  });
+
+  closeSummaryModal.addEventListener("click", closeSummary);
+
+  summaryModal.addEventListener("click", function (event) {
+    if (event.target === summaryModal) {
+      closeSummary();
+    }
+  });
+
+  document.querySelectorAll("input[name=\"summaryMode\"]").forEach(function (control) {
+    control.addEventListener("change", renderSummary);
+  });
   bookForm.addEventListener("submit", async function (event) {
     event.preventDefault();
 
@@ -186,16 +210,14 @@ var householdId = "shared-household";
     label.addEventListener("pointerdown", function (event) {
       event.preventDefault();
       var control = label.querySelector("input[name=\"expensePaidBy\"]");
-      if (control) {
-        setSelectedPayer(control.value);
+      if (!control) {
+        return;
       }
-    });
-
-    label.addEventListener("click", function () {
-      var control = label.querySelector("input[name=\"expensePaidBy\"]");
-      if (control) {
-        setSelectedPayer(control.value);
+      var selectedCount = getSelectedPayers().length;
+      if (control.checked && selectedCount === 1) {
+        return;
       }
+      control.checked = !control.checked;
     });
   });
 
@@ -396,6 +418,7 @@ var householdId = "shared-household";
     todayTotal.textContent = formatMoney(todaySum);
     monthTotal.textContent = formatMoney(monthExpenseSum);
     incomeTotal.textContent = formatMoney(monthIncomeSum);
+    balanceTotal.textContent = formatMoney(monthIncomeSum - monthExpenseSum);
   }
 
   function sumAmount(total, item) {
@@ -635,7 +658,7 @@ var householdId = "shared-household";
     } else {
       parts.push(renderCategory(item.category));
     }
-    parts.push(escapeHtml(item.paidBy || "-"));
+    parts.push(escapeHtml(renderPayerText(item.paidBy)));
     if (item.note) {
       parts.push(escapeHtml(item.note));
     }
@@ -643,12 +666,113 @@ var householdId = "shared-household";
   }
 
   function setSelectedPayer(value) {
-    var selected = document.querySelector("input[name=\"expensePaidBy\"][value=\"" + value + "\"]");
-    if (selected) {
-      selected.checked = true;
-    }
+    var payers = normalizePayers(value);
+    document.querySelectorAll("input[name=\"expensePaidBy\"]").forEach(function (control) {
+      control.checked = payers.indexOf(control.value) !== -1;
+    });
   }
 
+  function normalizePayers(value) {
+    if (Array.isArray(value)) {
+      return value.length ? value : ["yc"];
+    }
+    var text = String(value || "yc");
+    var payers = [];
+    if (text.indexOf("yc") !== -1) {
+      payers.push("yc");
+    }
+    if (text.indexOf("yd") !== -1) {
+      payers.push("yd");
+    }
+    return payers.length ? payers : ["yc"];
+  }
+
+  function renderPayerText(value) {
+    return normalizePayers(value).join(" + ");
+  }
+
+  function openSummary() {
+    summaryModal.classList.remove("hidden");
+    document.body.classList.add("modal-open");
+    renderSummary();
+  }
+
+  function closeSummary() {
+    summaryModal.classList.add("hidden");
+    document.body.classList.remove("modal-open");
+  }
+
+  function getSummaryMode() {
+    var selected = document.querySelector("input[name=\"summaryMode\"]:checked");
+    return selected ? selected.value : "category";
+  }
+
+  function renderSummary() {
+    var data = getSummaryData(getSummaryMode());
+    summaryLegend.innerHTML = "";
+    summaryEmpty.classList.toggle("hidden", data.length > 0);
+    summaryChart.classList.toggle("hidden", data.length === 0);
+
+    if (!data.length) {
+      summaryChart.style.background = "";
+      return;
+    }
+
+    var total = data.reduce(function (sum, item) {
+      return sum + item.amount;
+    }, 0);
+    var start = 0;
+    var gradients = data.map(function (item, index) {
+      var percent = item.amount / total * 100;
+      var end = start + percent;
+      var color = chartColors[index % chartColors.length];
+      var part = color + " " + start.toFixed(2) + "% " + end.toFixed(2) + "%";
+      item.color = color;
+      item.percent = percent;
+      start = end;
+      return part;
+    });
+
+    summaryChart.style.background = "conic-gradient(" + gradients.join(", ") + ")";
+    data.forEach(function (item) {
+      var row = document.createElement("div");
+      row.className = "summary-legend-row";
+      row.innerHTML = [
+        "<span class=\"summary-swatch\" style=\"background:" + item.color + "\"></span>",
+        "<span>" + escapeHtml(item.label) + "</span>",
+        "<strong>" + formatMoney(item.amount) + " · " + item.percent.toFixed(1) + "%</strong>"
+      ].join("");
+      summaryLegend.appendChild(row);
+    });
+  }
+
+  function getSummaryData(mode) {
+    var totals = {};
+    expenses.filter(function (item) {
+      return item.monthId === selectedMonthId && getEntryType(item) === "expense";
+    }).forEach(function (item) {
+      var amount = Number(item.amount || 0);
+      if (mode === "payer") {
+        var payers = normalizePayers(item.paidBy);
+        var splitAmount = amount / payers.length;
+        payers.forEach(function (payer) {
+          totals[payer] = (totals[payer] || 0) + splitAmount;
+        });
+      } else {
+        var category = item.category || "Other";
+        totals[category] = (totals[category] || 0) + amount;
+      }
+    });
+
+    return Object.keys(totals).map(function (label) {
+      return {
+        label: label,
+        amount: totals[label]
+      };
+    }).sort(function (a, b) {
+      return b.amount - a.amount;
+    });
+  }
   function defaultDateForMonth(monthId) {
     var today = todayAsInput();
     if (today.slice(0, 7) === monthId) {
@@ -754,3 +878,8 @@ var householdId = "shared-household";
   }
 
 })();
+
+
+
+
+
