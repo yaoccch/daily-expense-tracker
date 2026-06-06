@@ -605,8 +605,14 @@ var householdId = "shared-household";
   }
 
   function getSelectedPayer() {
-    var selected = document.querySelector("input[name=\"expensePaidBy\"]:checked");
-    return selected ? selected.value : "yc";
+    return getSelectedPayers().join("+");
+  }
+
+  function getSelectedPayers() {
+    var selected = Array.from(document.querySelectorAll("input[name=\"expensePaidBy\"]:checked")).map(function (control) {
+      return control.value;
+    });
+    return selected.length ? selected : ["yc"];
   }
 
   function getSelectedEntryType() {
@@ -886,6 +892,7 @@ var householdId = "shared-household";
   }
 
 })();
+
 
 
 
