@@ -654,6 +654,8 @@ var householdId = "shared-household";
     expenseCategory.disabled = isIncome;
     if (isIncome) {
       expenseCategory.value = "Income";
+    } else if (expenseCategory.value === "Income") {
+      expenseCategory.value = "Food";
     }
   }
 
@@ -884,6 +886,8 @@ var householdId = "shared-household";
   }
 
 })();
+
+
 
 
 
