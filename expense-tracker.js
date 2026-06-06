@@ -434,7 +434,7 @@ var householdId = "shared-household";
     expenseAmount.value = record.amount;
     setSelectedEntryType(getEntryType(record));
     expenseCategory.value = record.category === "Income" ? "Income" : record.category;
-    setSelectedPayer(record.paidBy || "yc");
+    setSelectedPayer(record.paidBy || "yc+yd");
     expenseNote.value = record.note || "";
     updateEntryLabels();
     openModal();
@@ -447,7 +447,7 @@ var householdId = "shared-household";
     expenseBook.value = selectedMonthId;
     expenseDate.value = defaultDateForMonth(selectedMonthId);
     setSelectedEntryType("expense");
-    setSelectedPayer("yc");
+    setSelectedPayer("yc+yd");
     updateEntryLabels();
   }
 
@@ -884,6 +884,7 @@ var householdId = "shared-household";
   }
 
 })();
+
 
 
 
