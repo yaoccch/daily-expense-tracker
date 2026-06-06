@@ -72,7 +72,6 @@ button {
 }
 
 .auth-note,
-.signed-in,
 .status-message {
   color: var(--muted);
 }
@@ -80,11 +79,6 @@ button {
 .auth-note {
   max-width: 34rem;
   line-height: 1.5;
-}
-
-.signed-in {
-  margin: 8px 0 0;
-  font-size: 0.92rem;
 }
 
 .login-form {
@@ -167,7 +161,8 @@ h2 {
   font-size: 0.76rem;
 }
 
-.sign-out-button {
+
+  .sign-out-button {
   margin-top: 12px;
 }
 
@@ -833,14 +828,6 @@ textarea:focus {
   .eyebrow {
     margin-bottom: 3px;
     font-size: 0.68rem;
-  }
-
-  .signed-in {
-    margin-top: 4px;
-    font-size: 0.72rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .sign-out-button {

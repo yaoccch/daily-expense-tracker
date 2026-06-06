@@ -38,7 +38,6 @@ var householdId = "shared-household";
   var loginPassword = document.getElementById("loginPassword");
   var loginButton = document.getElementById("loginButton");
   var authMessage = document.getElementById("authMessage");
-  var userEmail = document.getElementById("userEmail");
   var signOutButton = document.getElementById("signOutButton");
   var bookForm = document.getElementById("bookForm");
   var newBookMonth = document.getElementById("newBookMonth");
@@ -106,7 +105,6 @@ var householdId = "shared-household";
     onAuthStateChanged(auth, function (user) {
       currentUser = user;
       if (user) {
-        userEmail.textContent = user.email || "";
         authPanel.classList.add("hidden");
         appPanel.classList.remove("hidden");
         ensureMonthBook(selectedMonthId).catch(function (error) {
