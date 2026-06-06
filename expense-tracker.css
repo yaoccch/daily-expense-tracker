@@ -963,6 +963,10 @@ textarea:focus {
 
 .summary-modal-panel {
   padding: 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
 }
 
 .summary-modal-header {
@@ -1051,3 +1055,4 @@ textarea:focus {
   height: 12px;
   border-radius: 999px;
 }
+

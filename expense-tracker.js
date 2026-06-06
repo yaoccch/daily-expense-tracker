@@ -646,9 +646,15 @@ var householdId = "shared-household";
   function updateEntryLabels() {
     var type = getSelectedEntryType();
     var isEditing = Boolean(expenseId.value);
+    var isIncome = type === "income";
     formTitle.textContent = (isEditing ? "Edit " : "Add ") + type;
     submitButton.textContent = (isEditing ? "Update " : "Save ") + type;
-    categoryField.classList.toggle("hidden", type === "income");
+    categoryField.classList.toggle("hidden", isIncome);
+    expenseCategory.required = !isIncome;
+    expenseCategory.disabled = isIncome;
+    if (isIncome) {
+      expenseCategory.value = "Other";
+    }
   }
 
   function renderEntryMeta(item) {
@@ -878,6 +884,7 @@ var householdId = "shared-household";
   }
 
 })();
+
 
 
 
