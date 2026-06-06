@@ -397,7 +397,7 @@ var householdId = "shared-household";
   function getFilteredExpenses() {
     return expenses.filter(function (item) {
       var bookMatches = !selectedMonthId || item.monthId === selectedMonthId;
-      var categoryMatches = getEntryType(item) === "income" || filterCategory.value === "All" || item.category === filterCategory.value;
+      var categoryMatches = filterCategory.value === "All" || item.category === filterCategory.value;
       return bookMatches && categoryMatches;
     });
   }
@@ -433,7 +433,7 @@ var householdId = "shared-household";
     expenseName.value = record.name;
     expenseAmount.value = record.amount;
     setSelectedEntryType(getEntryType(record));
-    expenseCategory.value = record.category === "Income" ? "Other" : record.category;
+    expenseCategory.value = record.category === "Income" ? "Income" : record.category;
     setSelectedPayer(record.paidBy || "yc");
     expenseNote.value = record.note || "";
     updateEntryLabels();
@@ -653,7 +653,7 @@ var householdId = "shared-household";
     expenseCategory.required = !isIncome;
     expenseCategory.disabled = isIncome;
     if (isIncome) {
-      expenseCategory.value = "Other";
+      expenseCategory.value = "Income";
     }
   }
 
@@ -884,6 +884,7 @@ var householdId = "shared-household";
   }
 
 })();
+
 
 
 
