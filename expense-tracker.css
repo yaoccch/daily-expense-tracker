@@ -182,6 +182,17 @@ h2 {
   padding: 7px 9px;
 }
 
+.clickable-summary-card {
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.clickable-summary-card.active-filter {
+  border-color: var(--accent);
+  background: #eff6ff;
+}
+
 .summary-card strong {
   display: block;
   margin-top: 4px;

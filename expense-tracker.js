@@ -71,6 +71,7 @@ var householdId = "shared-household";
   var submitButton = document.getElementById("submitButton");
   var cancelEdit = document.getElementById("cancelEdit");
   var filterCategory = document.getElementById("filterCategory");
+  var summaryFilterCards = document.querySelectorAll("[data-entry-filter]");
   var todayTotal = document.getElementById("todayTotal");
   var monthTotal = document.getElementById("monthTotal");
   var incomeTotal = document.getElementById("incomeTotal");
@@ -87,6 +88,7 @@ var householdId = "shared-household";
   var monthUnsubscribe = null;
   var expenseUnsubscribes = [];
   var editingMonthId = "";
+  var activeEntryFilter = "All";
 
   expenseDate.value = todayAsInput();
   newBookMonth.value = selectedMonthId;
@@ -325,7 +327,22 @@ var householdId = "shared-household";
     }
   });
 
-  filterCategory.addEventListener("input", render);
+  filterCategory.addEventListener("input", function () {
+    activeEntryFilter = "All";
+    render();
+  });
+
+  summaryFilterCards.forEach(function (card) {
+    card.addEventListener("click", function () {
+      setEntryFilter(card.dataset.entryFilter);
+    });
+    card.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        setEntryFilter(card.dataset.entryFilter);
+      }
+    });
+  });
 
   cancelEdit.addEventListener("click", resetForm);
   cancelEdit.addEventListener("click", closeModal);
@@ -389,7 +406,8 @@ var householdId = "shared-household";
     return expenses.filter(function (item) {
       var bookMatches = !selectedMonthId || item.monthId === selectedMonthId;
       var categoryMatches = filterCategory.value === "All" || item.category === filterCategory.value;
-      return bookMatches && categoryMatches;
+      var entryMatches = activeEntryFilter === "All" || getEntryType(item) === activeEntryFilter;
+      return bookMatches && categoryMatches && entryMatches;
     });
   }
 
@@ -410,6 +428,21 @@ var householdId = "shared-household";
     monthTotal.textContent = formatMoney(monthExpenseSum);
     incomeTotal.textContent = formatMoney(monthIncomeSum);
     balanceTotal.textContent = formatMoney(monthIncomeSum - monthExpenseSum);
+    updateSummaryFilterCards();
+  }
+
+  function setEntryFilter(type) {
+    activeEntryFilter = activeEntryFilter === type ? "All" : type;
+    filterCategory.value = "All";
+    render();
+  }
+
+  function updateSummaryFilterCards() {
+    summaryFilterCards.forEach(function (card) {
+      var isActive = activeEntryFilter === card.dataset.entryFilter;
+      card.classList.toggle("active-filter", isActive);
+      card.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
   }
 
   function sumAmount(total, item) {
