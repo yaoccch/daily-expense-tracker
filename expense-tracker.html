@@ -69,12 +69,14 @@
           <h2 id="book-title">Book</h2>
         </div>
       </div>
-      <label class="book-select-label inline-select-label">
-        Select book
-        <select id="bookList" aria-label="Expense books"></select>
-      </label>
+      <div class="book-control-row">
+        <label class="book-select-label inline-select-label">
+          Select book
+          <select id="bookList" aria-label="Expense books"></select>
+        </label>
+        <button type="button" id="openSummaryModal" class="primary-button summary-button">Summary</button>
+      </div>
     </section>
-
     <section class="workspace">
       <section class="records-panel" aria-labelledby="records-title">
         <div class="records-toolbar">
@@ -108,9 +110,6 @@
           <p id="emptyState" class="empty-state">No expenses yet. Add your first daily record.</p>
         </div>
       </section>
-    </section>
-    <section class="summary-action-panel">
-      <button type="button" id="openSummaryModal" class="primary-button summary-button">Summary</button>
     </section>
 
     <section class="book-create-panel">
