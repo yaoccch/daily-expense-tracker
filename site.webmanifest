@@ -1,0 +1,16 @@
+{
+  "name": "Daily Expense Tracker",
+  "short_name": "Expense",
+  "start_url": "expense-tracker.html",
+  "display": "standalone",
+  "background_color": "#2563eb",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "app-icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
