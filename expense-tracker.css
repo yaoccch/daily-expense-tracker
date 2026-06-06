@@ -434,9 +434,11 @@ textarea:focus {
 
 .payer-toggle span,
 .entry-toggle span {
-  display: grid;
+  display: flex;
   min-height: 42px;
-  place-items: center;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   border: 1px solid var(--line);
   border-radius: 6px;
   background: #fff;
@@ -444,6 +446,23 @@ textarea:focus {
   font-weight: 700;
   pointer-events: none;
   user-select: none;
+}
+
+.payer-icon {
+  display: inline-grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: var(--accent-dark);
+  font-size: 0.82rem;
+  line-height: 1;
+}
+
+.wife-icon {
+  background: #fdf2f8;
+  color: #be185d;
 }
 
 .payer-toggle input:checked + span,
@@ -591,8 +610,16 @@ textarea:focus {
   content: "🛒";
 }
 
-.category-bills::before {
-  content: "▣";
+.category-housing::before {
+  content: "⌂";
+}
+
+.category-beauty::before {
+  content: "✦";
+}
+
+.category-utilities::before {
+  content: "⚡";
 }
 
 .category-health::before {
@@ -922,3 +949,4 @@ textarea:focus {
     white-space: nowrap;
   }
 }
+
