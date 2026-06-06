@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Expense Tracker</title>
+  <link rel="stylesheet" href="expense-tracker.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section id="authPanel" class="auth-panel" aria-labelledby="login-title">
+      <div>
+        <p class="eyebrow">Private household</p>
+        <h1 id="login-title">Sign in</h1>
+        <p class="auth-note">Only approved Firebase users can read or record shared expenses.</p>
+      </div>
+
+      <form id="loginForm" class="login-form">
+        <label>
+          Email
+          <input id="loginEmail" type="email" autocomplete="email" required>
+        </label>
+        <label>
+          Password
+          <input id="loginPassword" type="password" autocomplete="current-password" required>
+        </label>
+        <button type="submit" id="loginButton" class="primary-button">Sign in</button>
+        <p id="authMessage" class="status-message auth-status" aria-live="polite">Loading app...</p>
+      </form>
+    </section>
+
+    <section id="appPanel" class="hidden">
+    <section class="top-panel" aria-labelledby="app-title">
+      <div>
+        <h1 id="app-title">Expense Tracker</h1>
+        <p class="signed-in">Signed in as <span id="userEmail"></span></p>
+      </div>
+      <button type="button" id="signOutButton" class="ghost-button sign-out-button">Sign out</button>
+    </section>
+
+    <section class="summary-grid" aria-label="Expense summary">
+      <article class="summary-card">
+        <span>Income</span>
+        <strong id="incomeTotal">$0.00</strong>
+      </article>
+      <article class="summary-card">
+        <span>Expense</span>
+        <strong id="monthTotal">$0.00</strong>
+      </article>
+      <article class="summary-card">
+        <span>Today spend</span>
+        <strong id="todayTotal">$0.00</strong>
+      </article>
+    </section>
+
+    <section class="book-panel" aria-labelledby="book-title">
+      <div class="book-toolbar">
+        <div>
+          <h2 id="book-title">Book</h2>
+        </div>
+      </div>
+      <label class="book-select-label inline-select-label">
+        Select book
+        <select id="bookList" aria-label="Expense books"></select>
+      </label>
+    </section>
+
+    <section class="workspace">
+      <section class="records-panel" aria-labelledby="records-title">
+        <div class="records-toolbar">
+          <div>
+            <h2 id="records-title">Records</h2>
+            <p id="activeBookLabel" class="active-book-label">No book selected</p>
+          </div>
+          <button type="button" id="openExpenseModal" class="primary-button add-expense-button">Add expense</button>
+        </div>
+
+        <div class="filters" aria-label="Filter expenses">
+          <label>
+            Category
+            <select id="filterCategory">
+              <option value="All">All</option>
+              <option value="Food">Food</option>
+              <option value="Transport">Transport</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Housing">Housing</option>
+              <option value="Beauty">Beauty</option>
+              <option value="Utilities">Utilities</option>
+              <option value="Health">Health</option>
+              <option value="Other">Other</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="table-wrap">
+          <div id="expenseRows" class="expense-list"></div>
+          <p id="emptyState" class="empty-state">No expenses yet. Add your first daily record.</p>
+        </div>
+      </section>
+    </section>
+    <section class="book-create-panel">
+      <form id="bookForm" class="book-form" novalidate>
+        <label>
+          New book
+          <input id="newBookMonth" type="text" inputmode="numeric" placeholder="YYYY-MM" pattern="\d{4}-\d{2}" autocomplete="off" required>
+        </label>
+        <button type="submit" class="primary-button">Create</button>
+        <p id="bookMessage" class="status-message book-message" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <div id="expenseModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="formTitle">
+      <form id="expenseForm" class="expense-form modal-panel" novalidate>
+        <input type="hidden" id="expenseId">
+        <div class="form-header">
+          <h2 id="formTitle">Add expense</h2>
+        </div>
+
+        <fieldset class="entry-toggle">
+          <legend>Entry type</legend>
+          <label>
+            <input type="radio" name="entryType" value="expense" checked>
+            <span>Expense</span>
+          </label>
+          <label>
+            <input type="radio" name="entryType" value="income">
+            <span>Income</span>
+          </label>
+          <button type="button" id="cancelEdit" class="ghost-button entry-close-button">Close</button>
+        </fieldset>
+
+        <label>
+          Book
+          <select id="expenseBook" required></select>
+        </label>
+
+        <label>
+          Date
+          <input id="expenseDate" type="date" lang="en" required>
+        </label>
+
+        <label>
+          Description
+          <input id="expenseName" type="text" maxlength="80" required>
+        </label>
+        <div class="description-presets" aria-label="Description shortcuts">
+          <button type="button" data-description="Costco">Costco</button>
+          <button type="button" data-description="Marshalls">Marshalls</button>
+          <button type="button" data-description="Taobao">Taobao</button>
+          <button type="button" data-description="Ulta">Ulta</button>
+        </div>
+
+        <div class="form-row">
+          <label>
+            Amount
+            <input id="expenseAmount" type="number" min="0.01" step="0.01" placeholder="0.00" required>
+          </label>
+          <label id="categoryField">
+            Category
+            <select id="expenseCategory" required>
+              <option value="Food">Food</option>
+              <option value="Transport">Transport</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Housing">Housing</option>
+              <option value="Beauty">Beauty</option>
+              <option value="Utilities">Utilities</option>
+              <option value="Health">Health</option>
+              <option value="Other">Other</option>
+            </select>
+          </label>
+        </div>
+
+        <fieldset class="payer-toggle">
+          <legend>Paid by</legend>
+          <label>
+            <input type="radio" name="expensePaidBy" value="yc" checked>
+            <span><span class="payer-icon husband-icon" aria-hidden="true">♂</span>yc</span>
+          </label>
+          <label>
+            <input type="radio" name="expensePaidBy" value="yd">
+            <span><span class="payer-icon wife-icon" aria-hidden="true">♀</span>yd</span>
+          </label>
+        </fieldset>
+
+        <button type="submit" class="primary-button" id="submitButton">Save expense</button>
+        <p id="appMessage" class="status-message app-message" aria-live="polite"></p>
+
+        <label>
+          Note
+          <textarea id="expenseNote" rows="3" placeholder="Optional detail"></textarea>
+        </label>
+      </form>
+    </div>
+    </section>
+  </main>
+
+  <script type="module" src="expense-tracker.js"></script>
+</body>
+</html>
+
+

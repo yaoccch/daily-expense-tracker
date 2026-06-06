@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Daily Expense Tracker</title>
+    <link rel="stylesheet" href="daily-expense.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="summary-panel" aria-labelledby="app-title">
+        <div class="summary-copy">
+          <p class="eyebrow">Daily ledger</p>
+          <h1 id="app-title">Expense Tracker</h1>
+          <p class="summary-note">Record spending, scan totals, and keep daily notes in one quiet workspace.</p>
+        </div>
+
+        <div class="summary-grid" aria-label="Expense summary">
+          <article class="metric">
+            <span>Total spent</span>
+            <strong id="totalSpent">$0.00</strong>
+          </article>
+          <article class="metric">
+            <span>This month</span>
+            <strong id="monthSpent">$0.00</strong>
+          </article>
+          <article class="metric">
+            <span>Entries</span>
+            <strong id="entryCount">0</strong>
+          </article>
+          <article class="metric">
+            <span>Top category</span>
+            <strong id="topCategory">None</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <form id="expenseForm" class="expense-form" autocomplete="off">
+          <input type="hidden" id="expenseId">
+          <div class="form-header">
+            <h2 id="formTitle">Add expense</h2>
+            <button type="button" id="resetFormButton" class="icon-button" title="Clear form" aria-label="Clear form">x</button>
+          </div>
+
+          <label>
+            Date
+            <input type="date" id="dateInput" required>
+          </label>
+
+          <label>
+            Description
+            <input type="text" id="descriptionInput" placeholder="Lunch, fuel, groceries" maxlength="80" required>
+          </label>
+
+          <div class="form-row">
+            <label>
+              Amount
+              <input type="number" id="amountInput" min="0.01" step="0.01" placeholder="0.00" required>
+            </label>
+
+            <label>
+              Category
+              <select id="categoryInput" required>
+                <option value="Food">Food</option>
+                <option value="Transport">Transport</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Bills">Bills</option>
+                <option value="Health">Health</option>
+                <option value="Travel">Travel</option>
+                <option value="Other">Other</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            Note
+            <textarea id="noteInput" rows="3" maxlength="180" placeholder="Optional note"></textarea>
+          </label>
+
+          <button type="submit" class="primary-button" id="submitButton">Save expense</button>
+        </form>
+
+        <section class="records-panel" aria-labelledby="records-title">
+          <div class="records-header">
+          <div>
+            <p class="eyebrow">Records</p>
+            <h2 id="records-title">Daily expenses</h2>
+          </div>
+        </div>
+
+          <div class="filters" aria-label="Filter expenses">
+            <label>
+              Search
+              <input type="search" id="searchInput" placeholder="Find expense">
+            </label>
+            <label>
+              Category
+              <select id="categoryFilter">
+                <option value="all">All categories</option>
+                <option value="Food">Food</option>
+                <option value="Transport">Transport</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Bills">Bills</option>
+                <option value="Health">Health</option>
+                <option value="Travel">Travel</option>
+                <option value="Other">Other</option>
+              </select>
+            </label>
+            <label>
+              From
+              <input type="date" id="fromFilter">
+            </label>
+            <label>
+              To
+              <input type="date" id="toFilter">
+            </label>
+          </div>
+
+          <div class="list-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th class="amount-cell">Amount</th>
+                  <th class="action-cell">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="expenseTableBody"></tbody>
+            </table>
+            <div id="emptyState" class="empty-state" hidden>
+              <strong>No expenses yet</strong>
+              <span>Add your first daily expense to start tracking.</span>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="daily-expense.js"></script>
+  </body>
+</html>
