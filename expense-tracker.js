@@ -206,11 +206,9 @@ var householdId = "shared-household";
     control.addEventListener("change", updateEntryLabels);
   });
 
-  payerToggle.querySelectorAll("input[name=\"expensePaidBy\"]").forEach(function (control) {
-    control.addEventListener("change", function () {
-      if (!getSelectedPayers().length) {
-        control.checked = true;
-      }
+  payerToggle.querySelectorAll(".payer-choice").forEach(function (control) {
+    control.addEventListener("click", function () {
+      togglePayer(control);
     });
   });
 
@@ -602,10 +600,18 @@ var householdId = "shared-household";
   }
 
   function getSelectedPayers() {
-    var selected = Array.from(document.querySelectorAll("input[name=\"expensePaidBy\"]:checked")).map(function (control) {
-      return control.value;
+    var selected = Array.from(payerToggle.querySelectorAll(".payer-choice[aria-pressed=\"true\"]")).map(function (control) {
+      return control.dataset.payer;
     });
     return selected.length ? selected : ["yc"];
+  }
+
+  function togglePayer(control) {
+    var isSelected = control.getAttribute("aria-pressed") === "true";
+    if (isSelected && getSelectedPayers().length === 1) {
+      return;
+    }
+    control.setAttribute("aria-pressed", isSelected ? "false" : "true");
   }
 
   function getSelectedEntryType() {
@@ -672,8 +678,8 @@ var householdId = "shared-household";
 
   function setSelectedPayer(value) {
     var payers = normalizePayers(value);
-    document.querySelectorAll("input[name=\"expensePaidBy\"]").forEach(function (control) {
-      control.checked = payers.indexOf(control.value) !== -1;
+    payerToggle.querySelectorAll(".payer-choice").forEach(function (control) {
+      control.setAttribute("aria-pressed", payers.indexOf(control.dataset.payer) !== -1 ? "true" : "false");
     });
   }
 

@@ -406,7 +406,7 @@ textarea:focus {
   margin-bottom: 4px;
 }
 
-.payer-toggle label,
+.payer-toggle .payer-choice,
 .entry-toggle label {
   position: relative;
   display: block;
@@ -422,7 +422,6 @@ textarea:focus {
   font-size: 0.86rem;
 }
 
-.payer-toggle input,
 .entry-toggle input {
   position: absolute;
   width: 1px;
@@ -433,7 +432,7 @@ textarea:focus {
   clip-path: inset(50%);
 }
 
-.payer-toggle span,
+.payer-toggle .payer-choice,
 .entry-toggle span {
   display: flex;
   min-height: 42px;
@@ -444,9 +443,15 @@ textarea:focus {
   border-radius: 6px;
   background: #fff;
   color: var(--ink);
+  font: inherit;
   font-weight: 700;
-  pointer-events: none;
   user-select: none;
+}
+
+.payer-toggle .payer-choice {
+  width: 100%;
+  padding: 0 10px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .payer-icon {
@@ -466,7 +471,7 @@ textarea:focus {
   color: #be185d;
 }
 
-.payer-toggle input:checked + span,
+.payer-toggle .payer-choice[aria-pressed="true"],
 .entry-toggle input:checked + span {
   border-color: var(--accent);
   background: #eff6ff;

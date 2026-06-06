@@ -212,14 +212,12 @@
 
         <fieldset class="payer-toggle">
           <legend>Paid by</legend>
-          <label>
-            <input type="checkbox" name="expensePaidBy" value="yc" checked>
-            <span><span class="payer-icon husband-icon" aria-hidden="true">♂</span>yc</span>
-          </label>
-          <label>
-            <input type="checkbox" name="expensePaidBy" value="yd" checked>
-            <span><span class="payer-icon wife-icon" aria-hidden="true">♀</span>yd</span>
-          </label>
+          <button type="button" class="payer-choice" data-payer="yc" aria-pressed="true">
+            <span class="payer-icon husband-icon" aria-hidden="true">♂</span>yc
+          </button>
+          <button type="button" class="payer-choice" data-payer="yd" aria-pressed="true">
+            <span class="payer-icon wife-icon" aria-hidden="true">♀</span>yd
+          </button>
         </fieldset>
 
         <button type="submit" class="primary-button" id="submitButton">Save expense</button>
