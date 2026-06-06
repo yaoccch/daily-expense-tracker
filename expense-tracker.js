@@ -206,18 +206,11 @@ var householdId = "shared-household";
     control.addEventListener("change", updateEntryLabels);
   });
 
-  payerToggle.querySelectorAll("label").forEach(function (label) {
-    label.addEventListener("pointerdown", function (event) {
-      event.preventDefault();
-      var control = label.querySelector("input[name=\"expensePaidBy\"]");
-      if (!control) {
-        return;
+  payerToggle.querySelectorAll("input[name=\"expensePaidBy\"]").forEach(function (control) {
+    control.addEventListener("change", function () {
+      if (!getSelectedPayers().length) {
+        control.checked = true;
       }
-      var selectedCount = getSelectedPayers().length;
-      if (control.checked && selectedCount === 1) {
-        return;
-      }
-      control.checked = !control.checked;
     });
   });
 
@@ -433,7 +426,7 @@ var householdId = "shared-household";
     expenseName.value = record.name;
     expenseAmount.value = record.amount;
     setSelectedEntryType(getEntryType(record));
-    expenseCategory.value = record.category === "Income" ? "Income" : record.category;
+    expenseCategory.value = record.category === "Income" ? "Food" : record.category;
     setSelectedPayer(record.paidBy || "yc+yd");
     expenseNote.value = record.note || "";
     updateEntryLabels();
@@ -658,9 +651,7 @@ var householdId = "shared-household";
     categoryField.classList.toggle("hidden", isIncome);
     expenseCategory.required = !isIncome;
     expenseCategory.disabled = isIncome;
-    if (isIncome) {
-      expenseCategory.value = "Income";
-    } else if (expenseCategory.value === "Income") {
+    if (isIncome || expenseCategory.value === "Income") {
       expenseCategory.value = "Food";
     }
   }
@@ -892,6 +883,8 @@ var householdId = "shared-household";
   }
 
 })();
+
+
 
 
 
