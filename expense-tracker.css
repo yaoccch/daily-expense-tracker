@@ -195,7 +195,7 @@ h2 {
 }
 
 #incomeTotal,
-#balanceTotal {
+#balanceTotal.positive-balance {
   color: var(--income);
 }
 

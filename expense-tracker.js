@@ -426,7 +426,9 @@ var householdId = "shared-household";
     todayTotal.textContent = formatMoney(todaySum);
     monthTotal.textContent = formatMoney(monthExpenseSum);
     incomeTotal.textContent = formatMoney(monthIncomeSum);
-    balanceTotal.textContent = formatMoney(monthIncomeSum - monthExpenseSum);
+    var balanceSum = monthIncomeSum - monthExpenseSum;
+    balanceTotal.textContent = formatMoney(balanceSum);
+    balanceTotal.classList.toggle("positive-balance", balanceSum > 0);
     updateSummaryFilterCards();
   }
 
