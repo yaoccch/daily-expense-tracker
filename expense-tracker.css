@@ -642,7 +642,7 @@ textarea:focus {
 }
 
 .category-grocery::before {
-  content: "🥬";
+  content: "🛍";
 }
 
 .category-health::before {

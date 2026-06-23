@@ -479,6 +479,7 @@ var householdId = "shared-household";
     expenseBook.value = selectedMonthId;
     expenseDate.value = defaultDateForMonth(selectedMonthId);
     setSelectedEntryType("expense");
+    expenseCategory.value = "Food";
     setSelectedPayer("yc+yd");
     updateEntryLabels();
   }
