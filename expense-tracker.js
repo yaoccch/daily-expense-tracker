@@ -249,7 +249,8 @@ var householdId = "shared-household";
       updatedBy: currentUser.uid
     };
 
-    if (!record.date || !record.name || !record.amount || record.amount <= 0) {
+    if (!record.date || !record.name || !isValidAmount(record)) {
+      setStatus("Enter a non-zero expense amount. Income must be positive.", "error");
       return;
     }
 
@@ -445,6 +446,13 @@ var householdId = "shared-household";
 
   function sumAmount(total, item) {
     return total + Number(item.amount || 0);
+  }
+
+  function isValidAmount(record) {
+    if (!Number.isFinite(record.amount) || record.amount === 0) {
+      return false;
+    }
+    return getEntryType(record) === "expense" || record.amount > 0;
   }
 
   function startEdit(record) {
@@ -663,12 +671,18 @@ var householdId = "shared-household";
   }
 
   function amountClass(item) {
-    return getEntryType(item) === "income" ? "income-amount" : "expense-amount";
+    if (getEntryType(item) === "income" || Number(item.amount || 0) < 0) {
+      return "income-amount";
+    }
+    return "expense-amount";
   }
 
   function formatSignedMoney(item) {
-    var prefix = getEntryType(item) === "income" ? "+" : "";
-    return prefix + formatMoney(item.amount);
+    var amount = Number(item.amount || 0);
+    if (getEntryType(item) === "income" || amount < 0) {
+      return "+" + formatMoney(Math.abs(amount));
+    }
+    return formatMoney(amount);
   }
 
   function renderCategory(category) {
@@ -811,6 +825,8 @@ var householdId = "shared-household";
         label: label,
         amount: totals[label]
       };
+    }).filter(function (item) {
+      return item.amount > 0;
     }).sort(function (a, b) {
       return b.amount - a.amount;
     });
