@@ -641,6 +641,10 @@ textarea:focus {
   content: "⚡";
 }
 
+.category-grocery::before {
+  content: "🥬";
+}
+
 .category-health::before {
   content: "+";
 }
